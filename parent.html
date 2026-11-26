@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FamilyCraft Parents</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 3 28 9.5V22.5L16 29 4 22.5V9.5Z%22 fill=%22%236fd04a%22 stroke=%22%235a3414%22 stroke-width=%222%22/%3E%3Cpath d=%22M4 9.5 16 16 28 9.5M16 16V29%22 fill=%22none%22 stroke=%22%235a3414%22 stroke-width=%222%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf4e6;--card:#fffaf0;--ink:#4a2c14;--soft:#8a6a4c;--line:#ecdcc0;--teal:#2a9d8f;--sun:#f4b41a;--terra:#e2603f;--leaf:#4caf50}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#241a12;--card:#2f241a;--ink:#f6e9d6;--soft:#c9b394;--line:#4a3a2a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Prompt,'Sukhumvit Set',system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:24px;margin:0}h2{font-size:17px;margin:0 0 10px}
+.note{font-size:13px;color:var(--soft)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.big{font-size:30px;font-weight:700;line-height:1.1}.big small{font-size:14px;font-weight:500;color:var(--soft)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media (max-width:700px){.row{grid-template-columns:1fr}}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--soft)}
+.bars i{display:block;width:100%;max-width:34px;border-radius:8px 8px 3px 3px;background:var(--teal);min-height:2px}
+ul{list-style:none;margin:0;padding:0}li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}li:last-child{border:0}
+.tl li span:first-child{color:var(--soft);min-width:52px}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--line);font-size:12px}
+button,a.btn{font:inherit;font-weight:600;border:0;border-radius:12px;padding:9px 14px;background:var(--line);color:var(--ink);cursor:pointer;text-decoration:none}
+.empty{padding:30px;text-align:center;color:var(--soft)}
+</style>
+</head>
+<body>
+<main>
+  <header><div><h1 data-th="หน้าพ่อแม่" data-en="Parents">หน้าพ่อแม่</h1><div class="note" data-th="ต้นแบบ: อ่านข้อมูลการเล่นที่เก็บในเครื่องนี้เท่านั้น ยังไม่รวมหลายเครื่อง" data-en="Prototype: reads play data stored on this device only; not yet across devices">ต้นแบบ</div></div>
+    <div><button id="lang">EN</button> <a class="btn" href="game.html" data-th="กลับไปเล่น" data-en="Back to play">กลับไปเล่น</a></div></header>
+  <div id="app"></div>
+</main>
+<script type="module">
+import { readEvents, EVENTS } from './engine/telemetry/telemetry.js';
+let lang = (()=>{ try{ return JSON.parse(localStorage.getItem('fc-lang')) || 'th'; }catch(e){ return 'th'; } })();
+const T = { th: { week:'7 วันล่าสุด', coins:'เหรียญที่ได้ / ที่ใช้', active:'เวลาเล่นจริง', open:'เวลาเปิดเกม', days:'วันที่เล่น', sessions:'ครั้งที่เข้าเล่น', min:'นาที', built:'วางบล็อก', dug:'ขุด', goals:'เป้าหมายสำเร็จ', defeated:'ชนะเจ้าหนาม', hurt:'โดนจนเสียหัวใจ', rests:'หมดหัวใจ', ate:'กินผลไม้', perday:'เวลาเล่นต่อวัน', mix:'ช่วงเวลาที่ใช้ทำอะไร', building:'สร้าง', fighting:'ต่อสู้', exploring:'สำรวจเก็บของ', rooms:'ห้องที่เล่น', learn:'ช่วงเวลาที่ได้เรียนรู้', recent:'เหตุการณ์ล่าสุด', none:'ยังไม่มีข้อมูล ลองเล่นเกมสักพักแล้วกลับมาที่หน้านี้', home:'เกาะบ้าน', tower:'ภารกิจหอคอย', persist:'ความพยายาม', tries:'โดนแล้วเล่นต่อ' },
+            en: { week:'Last 7 days', coins:'Coins earned / spent', active:'Active play', open:'Time open', days:'Days played', sessions:'Sessions', min:'min', built:'Blocks placed', dug:'Blocks dug', goals:'Goals reached', defeated:'Critters beaten', hurt:'Times hurt', rests:'Ran out of hearts', ate:'Fruit eaten', perday:'Active play per day', mix:'How the time was spent', building:'Building', fighting:'Fighting', exploring:'Exploring and collecting', rooms:'Rooms played', learn:'Learning moments', recent:'Recent events', none:'No data yet. Play for a while, then come back here.', home:'Home island', tower:'Tower challenge', persist:'Persistence', tries:'kept going after a setback' } };
+const t = k => T[lang][k] || k;
+function render(){
+  document.documentElement.lang = lang; document.getElementById('lang').textContent = lang === 'th' ? 'EN' : 'ไทย';
+  document.querySelectorAll('[data-th]').forEach(e => e.textContent = e.dataset[lang]);
+  const since = Date.now() - 7 * 864e5, ev = readEvents().filter(e => e.t >= since), app = document.getElementById('app');
+  if (!ev.length){ app.innerHTML = `<div class="card empty">${t('none')}</div>`; return; }
+  const by = type => ev.filter(e => e.e === type), sum = (a, f) => a.reduce((s, e) => s + (f(e) || 0), 0);
+  const activeSec = sum(by('heartbeat'), e => e.d.activeSec) + sum(by('session_end'), e => e.d.activeSec % 30);
+  const openSec = sum(by('session_end'), e => e.d.totalSec);
+  const dayKey = ts => new Date(ts).toLocaleDateString('en-CA');
+  const days = new Set(ev.map(e => dayKey(e.t))), sessions = new Set(ev.map(e => e.s));
+  const perDay = []; for (let i = 6; i >= 0; i--){ const k = dayKey(Date.now() - i * 864e5); perDay.push([new Date(Date.now() - i * 864e5).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB', { weekday: 'short' }), sum(ev.filter(e => dayKey(e.t) === k && e.e === 'heartbeat'), e => e.d.activeSec) / 60]); }
+  const maxDay = Math.max(1, ...perDay.map(d => d[1]));
+  const build = by('block_place').length + by('block_break').length, fight = by('mob_defeat').length * 3 + by('hurt').length, explore = by('item_pickup').length + by('goal_progress').length * 2;
+  const tot = Math.max(1, build + fight + explore), pct = v => Math.round(v / tot * 100);
+  const rooms = {}; by('room_enter').forEach(e => rooms[e.d.room] = (rooms[e.d.room] || 0) + 1);
+  const hurtThenGoal = by('hurt').filter(h => ev.some(e => e.e === 'goal_progress' && e.t > h.t && e.s === h.s)).length;
+  const fmt = ts => new Date(ts).toLocaleTimeString(lang === 'th' ? 'th-TH' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+  const recent = ev.filter(e => !['heartbeat', 'item_pickup'].includes(e.e)).slice(-12).reverse();
+  app.innerHTML = `
+  <h2 style="margin-top:18px">${t('week')}</h2>
+  <div class="grid">
+    <div class="card"><div class="big">${Math.round(activeSec / 60)} <small>${t('min')}</small></div>${t('active')}</div>
+    <div class="card"><div class="big">${Math.round(openSec / 60)} <small>${t('min')}</small></div>${t('open')}</div>
+    <div class="card"><div class="big">${days.size}</div>${t('days')}</div>
+    <div class="card"><div class="big">${sessions.size}</div>${t('sessions')}</div>
+    <div class="card"><div class="big">${by('goal_complete').length}</div>${t('goals')}</div>
+    <div class="card"><div class="big">${by('block_place').length}</div>${t('built')}</div>
+    <div class="card"><div class="big">${sum(by('coins_earned'), e => e.d.n)} <small>/ ${sum(by('coins_spent'), e => e.d.n)}</small></div>${t('coins')}</div>
+  </div>
+  <div class="row">
+    <div class="card"><h2>${t('perday')}</h2><div class="bars">${perDay.map(([d, m]) => `<div><i style="height:${Math.round(m / maxDay * 100)}px"></i>${d}</div>`).join('')}</div></div>
+    <div class="card"><h2>${t('mix')}</h2><ul><li><span>${t('building')}</span><b>${pct(build)}%</b></li><li><span>${t('exploring')}</span><b>${pct(explore)}%</b></li><li><span>${t('fighting')}</span><b>${pct(fight)}%</b></li></ul>
+      <h2 style="margin-top:14px">${t('persist')}</h2><ul><li><span>${t('hurt')}</span><b>${by('hurt').length}</b></li><li><span>${t('rests')}</span><b>${by('respawn').length}</b></li><li><span>${t('tries')}</span><b>${hurtThenGoal}</b></li></ul></div>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <div class="card"><h2>${t('rooms')}</h2><ul>${Object.entries(rooms).map(([r, n]) => `<li><span>${t(r)}</span><b>${n}</b></li>`).join('')}</ul>
+      <h2 style="margin-top:14px">${t('learn')}</h2><ul>${by('skill').slice(-6).reverse().map(e => `<li><span class="tag">${e.d.skill}</span><span>${e.d.detail || ''}</span></li>`).join('') || `<li class="note">—</li>`}</ul></div>
+    <div class="card tl"><h2>${t('recent')}</h2><ul>${recent.map(e => `<li><span>${fmt(e.t)}</span><span style="flex:1">${EVENTS[e.e] ? e.e.replace(/_/g, ' ') : e.e}</span><span class="note">${Object.values(e.d || {}).slice(0, 2).join(' · ')}</span></li>`).join('')}</ul></div>
+  </div>`;
+}
+document.getElementById('lang').onclick = () => { lang = lang === 'th' ? 'en' : 'th'; try{ localStorage.setItem('fc-lang', JSON.stringify(lang)); }catch(e){} render(); };
+render();
+</script>
+</body>
+</html>

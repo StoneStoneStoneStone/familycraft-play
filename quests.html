@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FamilyCraft · Quest rooms</title>
+<link rel="stylesheet" href="css/brand.css">
+<style>
+:root{--bg:#F9FAFB;--card:#FFFFFF;--text:#2B2118;--muted:#7A6A5A;--line:#EFE7DC;color-scheme:light}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--fc-font-body);line-height:1.5;overflow-x:hidden}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 16px 56px}
+h1,h2,h3{font-family:var(--fc-font-head);margin:0;letter-spacing:.2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.eyebrow{font:600 12px var(--fc-font-body);letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+.lang{display:inline-flex;border:var(--fc-edge);border-radius:var(--fc-r-pill);background:var(--fc-paper);box-shadow:0 3px 0 var(--fc-ink);overflow:hidden}
+.lang button{font:600 14px var(--fc-font-body);border:0;background:transparent;color:var(--fc-ink);padding:7px 16px;min-height:40px;cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--fc-sun)}
+h1{font-size:clamp(30px,7vw,52px);line-height:1.05;margin:10px 0 8px}
+h1 span{color:var(--fc-leaf)}
+.lead{color:var(--muted);margin:0 0 6px;max-width:56ch}
+.note{display:flex;gap:10px;align-items:flex-start;margin:14px 0 22px;padding:10px 14px;border-radius:var(--fc-r-md);background:var(--fc-cream);font-size:14px}
+.note svg{flex:none;width:22px;height:22px;margin-top:1px}
+.grid{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1040px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--fc-r-lg);box-shadow:0 18px 40px rgba(90,60,30,.08);overflow:hidden;display:flex;flex-direction:column}
+.shot{position:relative;aspect-ratio:16/9;background:var(--fc-sky)}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.badge{position:absolute;left:10px;top:10px;width:44px;height:44px;border-radius:50%;background:var(--fc-paper);border:var(--fc-edge);box-shadow:0 3px 0 var(--fc-ink);display:grid;place-items:center}
+.badge svg{width:26px;height:26px}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h2{font-size:22px;line-height:1.15}
+.card h2 small{display:block;font:500 14px var(--fc-font-body);color:var(--muted);margin-top:3px;letter-spacing:0}
+.host{margin:0;font-size:14px;color:var(--fc-oak-dark)}
+.host b{font-weight:600}
+.bands{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.band{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);padding:6px 8px 6px 6px;border-radius:var(--fc-r-pill);min-height:48px}
+.band:hover{background:var(--fc-paper)}
+.band i{flex:none;font-style:normal;font:600 15px var(--fc-font-body);width:80px;text-align:center;padding:8px 12px;border-radius:var(--fc-r-pill);border:var(--fc-edge);background:var(--fc-leaf);color:#fff;text-shadow:0 1px 0 var(--fc-leaf-dark);box-shadow:0 4px 0 var(--fc-ink)}
+.band:nth-child(2) i{background:var(--fc-teal);text-shadow:0 1px 0 #1c7d6d}
+.band:nth-child(3) i{background:var(--fc-plum);text-shadow:0 1px 0 #5d3fa8}
+.band:active i{transform:translateY(3px);box-shadow:0 1px 0 var(--fc-ink)}
+.band:focus-visible{outline:3px solid var(--fc-sky-dark);outline-offset:2px}
+.band span{font-size:14px;line-height:1.35;min-width:0}
+.foot{margin-top:26px;color:var(--muted);font-size:13px}
+.foot a{color:var(--fc-leaf-dark)}
+</style>
+</head>
+<body><div class="wrap">
+<div class="top">
+  <div class="eyebrow">FamilyCraft · Quest rooms</div>
+  <div class="lang" role="group" aria-label="Language"><button id="lTh" aria-pressed="true">ไทย</button><button id="lEn" aria-pressed="false">EN</button></div>
+</div>
+<h1 id="h1"></h1>
+<p class="lead" id="lead"></p>
+<div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="#7A4A22" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.1"/></svg><span id="note"></span></div>
+<div class="grid" id="grid"></div>
+<p class="foot"><a href="game.html" id="back"></a></p>
+</div>
+<script>
+// Language: same key as the game (localStorage 'fc-lang', stored as JSON "th" or "en").
+const ICON = {
+  blueprint:'<svg viewBox="0 0 26 26" fill="none" stroke="#3A1F08" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="3" width="20" height="20" rx="3" fill="#A7D8FF"/><path d="M3 10h20M10 3v20M15 15h5v5h-5z" /></svg>',
+  dig:'<svg viewBox="0 0 26 26" fill="none" stroke="#3A1F08" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 22L15 11" /><path d="M13 5c5-1 9 2 9 6l-4-1-2-4z" fill="#B57A4E"/><path d="M4 22h8" /></svg>',
+  escape:'<svg viewBox="0 0 26 26" fill="none" stroke="#3A1F08" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><rect x="5" y="3" width="16" height="20" rx="3" fill="#FFC94D"/><circle cx="16" cy="13" r="1.6" fill="#3A1F08"/></svg>',
+  code:'<svg viewBox="0 0 26 26" fill="none" stroke="#3A1F08" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="3" width="20" height="20" rx="4" fill="#8E6BD8" stroke="#3A1F08"/><path d="M10 9l-4 4 4 4M16 9l4 4-4 4" stroke="#fff"/></svg>',
+  obby:'<svg viewBox="0 0 26 26" fill="none" stroke="#3A1F08" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="15" width="8" height="8" rx="1.5" fill="#6BAF5D"/><rect x="15" y="9" width="8" height="8" rx="1.5" fill="#2FB39E"/><path d="M7 11c1-5 6-6 8-3" /></svg>'
+};
+const T = {
+  th:{ eyebrow:'ห้องภารกิจ', h1:'ห้อง<span>ภารกิจ</span> เล่นเลย', lead:'ห้าเกมเล็ก ๆ ในเกาะบล็อก เลือกเกม แล้วเลือกช่วงอายุของลูก', note:'ชื่อตัวละครผู้ช่วยเป็นชื่อชั่วคราว จนกว่าจะอนุมัติแบบตัวละคร', back:'← กลับไปเกม', pick:'เลือกช่วงอายุ' },
+  en:{ eyebrow:'Quest rooms', h1:'Quest <span>rooms</span>, play now', lead:'Five small games on the block island. Pick a game, then your child\'s age band.', note:'Host names are temporary until the character designs are approved.', back:'← Back to the game', pick:'Pick an age band' }
+};
+const GAMES = [
+  { id:'blueprint', th:'แบบแปลนสร้างบ้าน', en:'Blueprint Build', hostTh:'ลุงตอก (บีเวอร์ช่างใหญ่)', hostEn:'Timber the beaver builder',
+    a:{th:'สมมาตร ครึ่งซ้ายวาด ครึ่งขวาก๊อป',en:'Symmetry: copy the left half to the right'},
+    b:{th:'เส้นรอบรูปและพื้นที่',en:'Perimeter and area'},
+    c:{th:'แปลน มุมมองด้านหน้า และปริมาตร',en:'Plan, front view and volume'} },
+  { id:'dig', th:'ขุดหาโบราณวัตถุ', en:'Dig the Past', hostTh:'ตุ่นนี่ (ตุ่นนักโบราณคดี)', hostEn:'Tunny the mole archaeologist',
+    a:{th:'ขุดตัวอักษรมาเรียงเป็นคำ',en:'Dig up letters and spell a word'},
+    b:{th:'ยุคหิน ยุคสำริด ยุคเหล็ก',en:'Stone, Bronze and Iron Age'},
+    c:{th:'เรียงเส้นเวลาจากเก่าไปใหม่',en:'Order a timeline, oldest first'} },
+  { id:'escape', th:'ห้องไขปริศนา', en:'Escape Room', hostTh:'โบลต์ (ตัวนิ่มนักประดิษฐ์)', hostEn:'Bolt the pangolin inventor',
+    a:{th:'ลำดับสีและรูปทรง',en:'Colour and shape patterns'},
+    b:{th:'เลขโรมันและการดูนาฬิกา',en:'Roman numerals and telling time'},
+    c:{th:'สมการหาตัวเลขที่หายไป',en:'Equations with a missing number'} },
+  { id:'code', th:'หุ่นยนต์โค้ดดิ้ง', en:'Code the Robot', hostTh:'โบลต์ (ตัวนิ่มนักประดิษฐ์)', hostEn:'Bolt the pangolin inventor',
+    a:{th:'สั่งลำดับ: เดิน เลี้ยว วาง ขุด',en:'Sequences: move, turn, place, dig'},
+    b:{th:'ใช้ลูป ทำซ้ำให้สั้นลง',en:'Loops: repeat to write less'},
+    c:{th:'เงื่อนไข ถ้าชนก็ทำอย่างอื่น',en:'Conditions: if blocked, do this'} },
+  { id:'obby', th:'ด่านกระโดดตอบคำถาม', en:'Answer Obby', hostTh:'ปิ๊บ (กบต้นไม้โค้ชกระโดด)', hostEn:'Pip the tree-frog jump coach',
+    a:{th:'เทียบจำนวนจุด และเสียงต้นของคำ',en:'Compare dot counts and first sounds'},
+    b:{th:'สูตรคูณ',en:'Times tables'},
+    c:{th:'เศษส่วน ทศนิยม และเปอร์เซ็นต์',en:'Fractions, decimals and percentages'} }
+];
+const BANDS = [['a','4–6'],['b','7–9'],['c','10–12']];
+let lang = 'th';
+try{ const v = JSON.parse(localStorage.getItem('fc-lang')); if (v === 'th' || v === 'en') lang = v; }catch(e){}
+function render(){
+  const t = T[lang]; document.documentElement.lang = lang;
+  document.querySelector('.eyebrow').textContent = t.eyebrow; document.getElementById('h1').innerHTML = t.h1;
+  document.getElementById('lead').textContent = t.lead; document.getElementById('note').textContent = t.note; document.getElementById('back').textContent = t.back;
+  document.getElementById('lTh').setAttribute('aria-pressed', lang === 'th'); document.getElementById('lEn').setAttribute('aria-pressed', lang === 'en');
+  document.getElementById('grid').innerHTML = GAMES.map(g => {
+    const other = lang === 'th' ? g.en : g.th;
+    return `<article class="card"><div class="shot"><img src="img/quests/${g.id}.jpg" alt="" width="480" height="252"><div class="badge">${ICON[g.id]}</div></div>
+      <div class="body"><h2>${g[lang]}<small>${other}</small></h2>
+      <p class="host"><b>${lang === 'th' ? g.hostTh : g.hostEn}</b></p>
+      <div class="bands" role="group" aria-label="${t.pick}">${BANDS.map(([k, label]) => `<a class="band" href="game.html?room=${g.id}&band=${k}"><i>${label}</i><span>${g[k][lang]}</span></a>`).join('')}</div></div></article>`;
+  }).join('');
+}
+const set = l => { lang = l; try{ localStorage.setItem('fc-lang', JSON.stringify(l)); }catch(e){} render(); };
+document.getElementById('lTh').onclick = () => set('th'); document.getElementById('lEn').onclick = () => set('en');
+render();
+</script>
+</body></html>

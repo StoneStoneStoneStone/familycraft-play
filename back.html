@@ -1,0 +1,3 @@
+<!doctype html><meta charset="utf-8"><title>FamilyCraft</title>
+<!-- A host's mini-game sends the player here when they leave it. Inside the island's frame it tells the island; opened alone it goes to the island. -->
+<script>if (parent !== window) parent.postMessage({ type: 'fc-game-back' }, location.origin); else location.replace('game.html');</script>

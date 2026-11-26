@@ -1,0 +1,136 @@
+/* Talkable hosts (engine/entity/npc.js): name tag, talk button, dialogue card, and the frame their mini-game opens in. FamilyCraft CI. */
+.npc-tag{position:fixed;left:0;top:0;z-index:2;pointer-events:none;padding:3px 12px 4px;border-radius:999px;background:var(--fc-paper);border:2.5px solid var(--fc-ink);
+  font:700 15px/1.2 var(--fc-font-head);color:var(--fc-ink);white-space:nowrap;box-shadow:0 3px 0 var(--fc-ink)}
+.npc-talk{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9;display:flex;align-items:center;gap:10px;
+  padding:8px 20px 8px 8px;border-radius:999px;border:3px solid var(--fc-ink);background:linear-gradient(#ffe08a,var(--fc-sun) 55%,#eaa520);color:var(--fc-ink);
+  font:700 19px/1 var(--fc-font-head);white-space:nowrap;cursor:pointer;box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 5px 0 var(--fc-ink),0 10px 14px rgba(40,20,5,.35);animation:npcPop .3s cubic-bezier(.3,1.6,.5,1)}
+.npc-talk[hidden]{display:none}
+.npc-talk i{width:38px;height:38px;border-radius:50%;background:var(--fc-paper) center/62% no-repeat;border:2.5px solid var(--fc-ink);flex:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5h-7l-4.5 3.8V17H4a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 4 5.5Z' fill='%23E5484D' stroke='%233A1F08' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.npc-talk:active{transform:translateX(-50%) translateY(3px);box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 2px 0 var(--fc-ink)}
+@keyframes npcPop{from{transform:translateX(-50%) scale(.6);opacity:0}}
+/* while talking the play controls step aside */
+body.talking #act,body.talking #joy,body.talking #bar,body.talking #hint,body.talking #stars,body.talking #pcard,body.talking #gear,body.talking #bView,body.talking #togChip,body.talking .floaters{opacity:0!important;visibility:hidden;pointer-events:none}
+.npc-dlg{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:0 14px calc(14px + env(safe-area-inset-bottom));pointer-events:none;animation:npcUp .3s ease-out}
+@keyframes npcUp{from{transform:translateY(30px);opacity:0}}
+.npc-dlg .bust{width:clamp(120px,22vw,210px);height:auto;margin-right:-26px;position:relative;z-index:1;filter:drop-shadow(0 5px 0 rgba(58,31,8,.3));flex:none}
+.npc-dlg .card{pointer-events:auto;position:relative;width:min(640px,100%);min-width:0;background:var(--fc-paper);border:3px solid var(--fc-ink);border-radius:22px;padding:26px 20px 14px 38px;box-shadow:0 6px 0 var(--fc-ink),0 14px 20px rgba(40,20,5,.35)}
+.npc-dlg .who{position:absolute;left:30px;top:-17px;padding:4px 16px 5px;border-radius:999px;background:var(--fc-oak);border:3px solid var(--fc-ink);color:var(--fc-paper);font:700 17px/1.15 var(--fc-font-head);white-space:nowrap;text-shadow:0 1.5px 0 var(--fc-ink)}
+.npc-dlg .line{margin:0;min-height:3.1em;font:600 19px/1.5 var(--fc-font-body);color:var(--fc-ink);text-wrap:pretty}
+.npc-dlg.picking .line{min-height:0;font:700 19px/1.3 var(--fc-font-head)}
+.npc-dlg .pick{display:grid;gap:8px;margin-top:10px}.npc-dlg .pick:empty{display:none}
+.npc-dlg .opts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.npc-dlg .opts small{flex:none;width:3.4em;font:600 15px var(--fc-font-body);color:#7a5a3a}
+.npc-dlg .opt{flex:1 1 0;min-width:74px;min-height:44px;padding:6px 10px;border-radius:14px;border:2.5px solid var(--fc-ink);background:#fff;color:var(--fc-ink);font:700 17px/1.1 var(--fc-font-head);cursor:pointer;box-shadow:0 3px 0 var(--fc-ink);white-space:nowrap}
+.npc-dlg .opt.on{background:var(--fc-leaf);color:#fff;text-shadow:0 1.5px 0 #2f5f28}
+.npc-dlg .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+.npc-dlg .row button{min-height:44px;padding:8px 20px;border-radius:999px;border:3px solid var(--fc-ink);font:700 18px/1 var(--fc-font-head);cursor:pointer;color:var(--fc-ink);white-space:nowrap}
+.npc-dlg .later{background:var(--fc-cream);box-shadow:0 3px 0 var(--fc-ink)}
+.npc-dlg .next{background:linear-gradient(#ffe08a,var(--fc-sun) 55%,#eaa520);box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 4px 0 var(--fc-ink)}
+.npc-dlg .row button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--fc-ink)}
+.npc-game{position:fixed;inset:0;width:100%;height:100%;border:0;z-index:50;background:#fff}
+@media (max-height:500px){
+  .npc-dlg{padding-bottom:calc(8px + env(safe-area-inset-bottom))}.npc-dlg .bust{width:112px;margin-right:-20px}
+  .npc-dlg .card{padding:20px 14px 10px 30px;border-radius:18px}.npc-dlg .line{font-size:15px;min-height:2.9em}.npc-dlg.picking .line{font-size:16px}
+  .npc-dlg .opt{min-height:38px;font-size:15px}.npc-dlg .row{margin-top:8px}.npc-dlg .row button{min-height:38px;font-size:16px;padding:6px 16px}
+  .npc-dlg .pick{gap:6px;margin-top:6px}.npc-talk{bottom:calc(62px + env(safe-area-inset-bottom));font-size:16px;padding:5px 16px 5px 5px}.npc-talk i{width:30px;height:30px}.npc-tag{font-size:13px}
+}
+@media (max-width:720px) and (orientation:portrait){
+  .npc-dlg{flex-direction:column;align-items:flex-start;padding:0 10px calc(12px + env(safe-area-inset-bottom))}.npc-dlg .bust{width:120px;margin:0 0 -22px 6px}
+  .npc-dlg .card{padding:26px 14px 12px}.npc-dlg .who{left:136px;top:-20px}.npc-dlg .line{font-size:17px}.npc-dlg .opt{font-size:16px;min-width:64px}
+  .npc-talk{bottom:calc(238px + env(safe-area-inset-bottom));font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){.npc-talk,.npc-dlg{animation:none}}
+
+/* quest: Fit part button (same place as Talk), a note line under a card, the goal sign */
+.npc-talk.fit i.it{background:var(--fc-paper);display:grid;place-items:center}.npc-talk.fit i.it>*{width:74%;height:74%}
+.npc-talk.fit.short{background:linear-gradient(#fff,var(--fc-cream) 55%,#e2cdb0)}
+.npc-dlg .note{display:block;margin-top:4px;font:600 15px/1.4 var(--fc-font-body);color:#2f7a34;min-height:0}.npc-dlg .note:empty{display:none}
+
+/* ================= dialogue box v2 (owner 2026-11-26; art and layout by Codex: design/dialogue/) =================
+   Big portrait on top of a painted oak-and-paper panel, big name plate, big text, big buttons; the main button invites a press. */
+body .npc-dlg{display:grid;grid-template-columns:min(780px,100%);justify-content:center;align-items:end;padding:0 12px calc(10px + env(safe-area-inset-bottom));--bust:190px;--rim:22px;animation:npcUp .28s ease-out}
+body .npc-dlg .bust{grid-column:1;grid-row:1;justify-self:start;width:var(--bust);height:auto;margin:0 0 -30px 6px;position:relative;z-index:0;filter:drop-shadow(0 4px 0 rgba(58,31,8,.28));animation:none}
+body .npc-dlg .card{grid-column:1;grid-row:2;position:relative;z-index:1;width:auto;min-width:0;background:none;box-shadow:none;border-radius:0;border:var(--rim) solid transparent;
+  border-image:url(../img/ui/dlg/panel.svg) 22 fill / var(--rim) / 0 stretch;padding:8px 16px 6px;filter:drop-shadow(0 5px 0 rgba(58,31,8,.35)) drop-shadow(0 12px 14px rgba(40,20,5,.3))}
+body .npc-dlg .who{position:absolute;left:calc(var(--bust) - 4px);top:calc(-1 * var(--rim) - 50px);height:52px;display:flex;align-items:center;padding:0 10px;background:none;border-radius:0;
+  border:solid transparent;border-width:0 22px;border-image:url(../img/ui/dlg/name-plate.svg) 0 24 fill / 0 22px / 0 stretch;color:var(--fc-ink);text-shadow:none;font:700 30px/1 var(--fc-font-head);white-space:nowrap}
+body .npc-dlg .line{font:600 25px/1.45 var(--fc-font-body);min-height:0;margin:0;color:var(--fc-ink);text-wrap:pretty}
+body .npc-dlg.picking .line{min-height:0;font:700 24px/1.3 var(--fc-font-head)}
+body .npc-dlg .note{font:600 19px/1.4 var(--fc-font-body);color:#2f7a34;margin-top:2px}
+body .npc-dlg .row{margin-top:8px;gap:12px;align-items:center}
+body .npc-dlg .row button{min-height:56px;min-width:128px;padding:0 6px 3px;background:none;box-shadow:none;border-radius:0;border:solid transparent;border-width:0 24px;
+  border-image:url(../img/ui/dlg/btn-secondary.svg) 0 29 fill / 0 24px / 0 stretch;font:700 23px/1 var(--fc-font-head);color:var(--fc-ink);cursor:pointer;transition:transform .08s}
+body .npc-dlg .row .next{border-image-source:url(../img/ui/dlg/btn-primary.svg);min-width:150px;animation:dlgInvite 1.6s ease-in-out infinite;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+body .npc-dlg .row .next::after{content:"";width:22px;height:22px;flex:none;background:url(../img/ui/dlg/next-arrow.svg) center/contain no-repeat;animation:dlgBob 1.6s ease-in-out infinite}
+body .npc-dlg .row button:active{transform:translateY(3px);filter:brightness(.94);box-shadow:none;animation:none}
+@keyframes dlgInvite{0%,100%{filter:drop-shadow(0 2px 0 rgba(90,52,20,.36)) brightness(1);transform:scale(1)}48%{filter:drop-shadow(0 0 9px #ffe08a) brightness(1.12);transform:scale(1.045)}}
+@keyframes dlgBob{0%,100%{transform:translateX(0)}48%{transform:translateX(4px)}}
+body .npc-dlg .pick{gap:8px;margin-top:8px}
+body .npc-dlg .opts small{width:3.2em;font:600 18px var(--fc-font-body);color:#7a5a3a}
+body .npc-dlg .opt{min-height:50px;font:700 21px/1.1 var(--fc-font-head);border:3px solid var(--fc-ink);border-radius:14px;background:var(--fc-paper);box-shadow:0 3px 0 var(--fc-ink)}
+body .npc-dlg .opt.on{background:var(--fc-leaf);color:#fff;text-shadow:0 1.5px 0 #2f5f28;box-shadow:0 3px 0 var(--fc-ink),inset 0 0 0 3px #fff}
+body .npc-dlg .opt.on::before{content:"";display:inline-block;width:.62em;height:.34em;margin:0 .4em .22em 0;border-left:4px solid #fff;border-bottom:4px solid #fff;transform:rotate(-45deg)}
+/* the Talk and Fit buttons invite a press too */
+.npc-talk{animation:npcPop .3s cubic-bezier(.3,1.6,.5,1),talkInvite 1.6s ease-in-out .3s infinite}
+@keyframes talkInvite{0%,100%{box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 5px 0 var(--fc-ink),0 10px 14px rgba(40,20,5,.35)}50%{box-shadow:inset 0 3px 0 rgba(255,255,255,.55),0 5px 0 var(--fc-ink),0 0 0 6px rgba(255,201,77,.55),0 10px 14px rgba(40,20,5,.35)}}
+@media (max-height:500px){
+  body .npc-dlg{--bust:118px;--rim:18px;padding:0 10px calc(6px + env(safe-area-inset-bottom))}
+  body .npc-dlg .bust{margin:0 0 -22px 4px}
+  body .npc-dlg .card{padding:4px 12px 2px}
+  body .npc-dlg .who{font-size:24px;height:44px;top:calc(-1 * var(--rim) - 42px)}
+  body .npc-dlg .line{font-size:20px;line-height:1.42}body .npc-dlg.picking .line{font-size:20px}
+  body .npc-dlg .row{margin-top:4px}body .npc-dlg .row button{min-height:52px;font-size:21px}
+  body .npc-dlg.picking .bust{display:none}body .npc-dlg.picking .who{left:8px}
+  body .npc-dlg .pick{gap:6px;margin-top:4px}body .npc-dlg .opt{min-height:44px;font-size:19px}body .npc-dlg .note{font-size:16px}
+}
+@media (max-width:720px) and (orientation:portrait){
+  body .npc-dlg{--bust:140px;--rim:20px;flex-direction:unset;align-items:end;padding:0 8px calc(10px + env(safe-area-inset-bottom))}
+  body .npc-dlg .bust{margin:0 0 -26px 2px;width:var(--bust)}
+  body .npc-dlg .card{padding:6px 10px 4px}
+  body .npc-dlg .who{font-size:24px;height:46px;left:calc(var(--bust) - 6px);top:calc(-1 * var(--rim) - 44px)}
+  body .npc-dlg .line{font-size:21px}
+  body .npc-dlg .row button{min-height:54px;font-size:21px;min-width:112px}body .npc-dlg .row .next{min-width:132px}
+  body .npc-dlg .opt{min-width:58px;font-size:19px;padding:6px 4px}body .npc-dlg .opts{gap:6px}body .npc-dlg .opts small{width:100%;font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){body .npc-dlg .row .next,body .npc-dlg .row .next::after,.npc-talk{animation:none}}
+
+/* dialogue paper (owner 2026-11-26: "no bald white"): Codex's paper tile under the text, inset in the oak rim; option chips as paper cards */
+body .npc-dlg .card{border-image:url(../img/ui/dlg/panel-v2.svg) 22 / var(--rim) / 0 stretch;background:#FAEEDD url(../img/ui/dlg/paper-tile.svg) 0 0 / 256px 256px repeat;background-origin:padding-box;background-clip:padding-box}
+body .npc-dlg .opt{border:solid transparent;border-width:0 20px;border-radius:0;background:none;box-shadow:none;border-image:url(../img/ui/dlg/btn-option.svg) 0 29 fill / 0 20px / 0 stretch;padding:0 2px 2px}
+body .npc-dlg .opt.on{border-image-source:url(../img/ui/dlg/btn-option-on.svg);background:none;box-shadow:none}
+
+/* ---------- landscape only (owner 2026-11-26): a phone held upright gets a friendly "turn it" screen; Android also turns by itself after the first tap ---------- */
+#rotate{display:none;position:fixed;inset:0;z-index:200;background:var(--fc-paper);color:var(--fc-ink);flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+#rotate b{font:700 26px/1.25 var(--fc-font-head)}#rotate small{font:500 17px/1.5 var(--fc-font-body);color:#7a5a3a;max-width:18em}
+#rotate .ph{width:84px;height:140px;border:5px solid var(--fc-ink);border-radius:18px;background:var(--fc-sky);position:relative;animation:phTurn 2.4s ease-in-out infinite;box-shadow:0 5px 0 var(--fc-ink)}
+#rotate .ph i{position:absolute;left:50%;bottom:8px;width:22px;height:5px;margin-left:-11px;border-radius:3px;background:var(--fc-ink)}
+@keyframes phTurn{0%,25%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+@media (orientation:portrait) and (max-width:820px) and (pointer:coarse){#rotate{display:flex}}
+@media (prefers-reduced-motion:reduce){#rotate .ph{animation:none;transform:rotate(-90deg)}}
+
+/* islanders are talked to by tapping them (owner 2026-11-26): the name tag carries a chat bubble that bobs when you are close enough */
+button.npc-tag{pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:6px;padding:3px 12px 4px 4px;font:700 15px/1.2 var(--fc-font-head);z-index:4}
+button.npc-tag i{width:30px;height:30px;flex:none;border-radius:50%;background:var(--fc-sun) center/64% no-repeat;border:2.5px solid var(--fc-ink);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5h-7l-4.5 3.8V17H4a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 4 5.5Z' fill='%23FFF8EC' stroke='%233A1F08' stroke-width='1.8' stroke-linejoin='round'/%3E%3Ccircle cx='8' cy='11.2' r='1.3' fill='%233A1F08'/%3E%3Ccircle cx='12' cy='11.2' r='1.3' fill='%233A1F08'/%3E%3Ccircle cx='16' cy='11.2' r='1.3' fill='%233A1F08'/%3E%3C/svg%3E")}
+button.npc-tag.near i{animation:tagBob 1s ease-in-out infinite;box-shadow:0 0 0 4px rgba(255,201,77,.5)}
+@keyframes tagBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.12)}}
+@media (prefers-reduced-motion:reduce){button.npc-tag.near i{animation:none}}
+body .npc-dlg .bust{object-fit:contain;object-position:bottom}
+
+/* first-person view is off for now: no view button, settings moves to the corner */
+html body #bView#bView{display:none!important}
+
+/* talk focus (owner 2026-11-26): the world goes soft and a little dim while an islander talks; the drawn character is bigger */
+#c,canvas#c{transition:filter .25s}
+body.talking canvas{filter:blur(5px) brightness(.82) saturate(.9)}
+body .npc-dlg{--bust:250px}
+body .npc-dlg .bust{margin-bottom:-38px}
+@media (max-height:500px){ body .npc-dlg{--bust:176px} body .npc-dlg .bust{margin:0 0 -30px 0} body .npc-dlg .who{left:calc(var(--bust) - 14px)} }
+
+/* owner 2026-11-26: both dialogue buttons sit together at the bottom right; the spoken line is bigger */
+body .npc-dlg .row{justify-content:flex-end;gap:10px}
+body .npc-dlg .row .later[style*="hidden"]{display:none}
+body .npc-dlg .line{font-size:29px;line-height:1.4}
+body .npc-dlg.picking .line{font-size:26px}
+@media (max-height:500px){ body .npc-dlg .line{font-size:24px;line-height:1.36} body .npc-dlg.picking .line{font-size:21px} }

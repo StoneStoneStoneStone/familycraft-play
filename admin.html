@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FamilyCraft Game Data</title>
+<link rel="stylesheet" href="css/brand.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<style>
+:root{--bg:#F9FAFB;--card:#fff;--line:#EFE7DC;--muted:#7A6A5A;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#2B2118;font-family:var(--fc-font-body)}
+header{position:sticky;top:0;z-index:5;background:rgba(249,250,251,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font:700 22px var(--fc-font-head);margin:0;flex:1;min-width:200px}h1 small{display:block;font:500 13px var(--fc-font-body);color:var(--muted)}
+.btn{font:600 15px var(--fc-font-body);padding:9px 18px;border-radius:999px;border:3px solid var(--fc-ink);box-shadow:0 4px 0 var(--fc-ink);cursor:pointer;background:var(--fc-paper);color:var(--fc-ink)}
+.btn.pri{background:var(--fc-leaf);color:#fff;text-shadow:0 1px 0 var(--fc-leaf-dark)}.btn.teal{background:var(--fc-teal);color:#fff}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--fc-ink)}
+nav{max-width:1100px;margin:0 auto;padding:0 16px 10px;display:flex;gap:6px;overflow-x:auto}
+nav button{font:600 14px var(--fc-font-body);border:2px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;color:#5a4636}
+nav button.on{background:var(--fc-ink);color:#fff;border-color:var(--fc-ink)}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 34px rgba(90,60,30,.07);padding:18px;overflow-x:auto}
+.card h2{font:700 19px var(--fc-font-head);margin:0 0 4px}.card p.lead{margin:0 0 14px;color:var(--muted);font-size:14px}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th{font:600 12px var(--fc-font-body);color:var(--muted);text-align:left;padding:6px 8px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle;font-size:14px}
+.name b{display:block}.name small{color:var(--muted)}
+input[type=number],input[type=text]{width:84px;font:600 15px var(--fc-font-body);padding:6px 8px;border:2px solid #E2D6C4;border-radius:10px;background:#fffdf8;color:var(--fc-ink)}
+input[type=text]{width:220px}
+input.changed{border-color:var(--fc-sun);background:#fff7dc}
+.out{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;background:#F4F0EA;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.chip b{font:700 14px var(--fc-font-body)}
+.chip.good{background:#E6F4E1}.chip.slow{background:#FFF1D6}.chip.no{background:#FBE3E3}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--fc-ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.on{opacity:1}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+ <div class="bar">
+  <h1>หลังบ้านเกม · Game Data<small id="src">กำลังโหลด…</small></h1>
+  <button class="btn teal" id="try">ลองในเกม</button>
+  <button class="btn pri" id="save">บันทึก</button>
+  <button class="btn" id="reset">คืนค่าเดิม</button>
+ </div>
+ <nav id="tabs"></nav>
+</header>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+<script type="module">
+import { snapshot, apply, TUNING } from './engine/data/tuning.js';
+import { BLOCKS } from './engine/world/voxel.js';
+import { ITEMS } from './engine/items/items.js';
+
+const TH = { hand:'มือเปล่า', sword:'ดาบไม้', sword_stone:'ดาบหิน', sword_iron:'ดาบเหล็ก', sword_copper:'ดาบทองแดง', sword_silver:'ดาบเงิน', sword_gold:'ดาบทอง', sword_diamond:'ดาบเพชร', iron_ore:'แร่เหล็ก', copper_ore:'แร่ทองแดง', silver_ore:'แร่เงิน', diamond_ore:'แร่เพชร', iron:'เหล็ก', copper:'ทองแดง', silver:'เงิน', diamond:'เพชร', axe:'ขวาน', pickaxe:'อีเต้อ', shovel:'พลั่ว', hoe:'จอบ', can:'บัวรดน้ำ', apple:'แอปเปิ้ล', carrot:'แครอท', seeds:'เมล็ด', gel:'เยลลี่', bed:'เตียง',
+  soil:'ดิน', grass:'หญ้า', stone:'หิน', log:'ท่อนไม้', planks:'ไม้แผ่น', leaves:'ใบไม้', sand:'ทราย', brick:'อิฐ', gold:'ทอง', farmland:'แปลงผัก', farmwet:'แปลงรดน้ำ',
+  jelly:'ผึ้งน้ำผึ้ง', beetle:'ด้วงจุด', spiky:'ดอกหนาม', frost:'เจลลี่หิมะ (แผนที่หิมะ)' };
+const TUNE_TH = { player:'ตัวละคร', stamina:'พลังงาน', dig:'การขุด', hp:'หัวใจ (2 = 1 ดวง)', walk:'เดินเร็ว', tiredWalk:'เดินตอนหมดแรง', jump:'แรงกระโดด', tiredJump:'กระโดดตอนหมดแรง',
+  jumpS:'', hit:'ตี 1 ที ใช้', airSwing:'ฟันลม 1 ที ใช้', digPerSec:'ขุด ต่อวินาที ใช้', runPerSec:'วิ่ง ต่อวินาที ใช้', till:'พรวนดิน ใช้', restSit:'นั่งพัก ฟื้น/วินาที', restIdle:'ยืนนิ่ง ฟื้น/วินาที',
+  clock:'นาฬิกาบนเกาะ', dayMinutes:'1 วันบนเกาะ ยาวกี่นาทีของการเล่น', startHour:'เกาะใหม่เริ่มตอนกี่โมง', nightLight:'ความสว่างต่ำสุดตอนกลางคืน (0–1)', nightFogNear:'กลางคืน หมอกเริ่ม (ช่อง)', nightFogFar:'กลางคืน มองเห็นไกลสุด (ช่อง)', playerGlow:'แสงจาง ๆ รอบตัวผู้เล่นตอนกลางคืน', mob:'มอนสเตอร์ กลางวัน/กลางคืน', nightSight:'กลางคืน มองเห็นไกลขึ้น (เท่า)', nightSpeed:'กลางคืน วิ่งเร็วขึ้น (เท่า)', angryTime:'กลางวัน โดนตีแล้วโกรธนาน (วินาที)', callRange:'เรียกพวกสีเดียวกันมาช่วยในระยะ (ช่อง)',
+  shop:'ร้านแต่งตัว (ราคาเป็นเหรียญ)', hatSand:'หมวกนักสำรวจ สีทราย', hatFern:'หมวกนักสำรวจ สีใบไม้', hatSky:'หมวกนักสำรวจ สีฟ้า',
+  coins:'เหรียญ', start:'ผู้เล่นใหม่เริ่มด้วยเหรียญ', bridgeJob:'ค่าแรงงานสร้างสะพาน (ลุงบีเวอร์จ่าย, เหรียญ)',
+  ore:'แร่ใต้ดิน (เกาะใหม่ หรือเกาะเก่าที่ยังไม่มีแร่)', ironChance:'โอกาสหินใต้ดินเป็นแร่เหล็ก (0–1)', copperChance:'โอกาสเป็นแร่ทองแดง (0–1)', silverChance:'โอกาสเป็นแร่เงิน (0–1)', diamondChance:'โอกาสเป็นแร่เพชร (0–1)', silverDepth:'แร่เงินอยู่ลึกถึงชั้นไหน (0 = ล่างสุด)', diamondDepth:'แร่เพชรอยู่ลึกถึงชั้นไหน (0 = ล่างสุด)',
+  npc:'ตัวละครเจ้าของเกม', talkRange:'ปุ่มคุยขึ้นเมื่อเข้าใกล้ (ช่อง)', noticeRange:'หันมาโบกมือเมื่อเข้าใกล้ (ช่อง)', fox:'ภารกิจต่อรถจิ้งจอกซิ่ง', framePlanks:'ฐานรถ ใช้ไม้แผ่น', wheelStone:'ชุดล้อ ใช้หิน', rearPlanks:'ท้ายรถ ใช้ไม้แผ่น', deliveryRange:'ปุ่มใส่ชิ้นส่วนขึ้นเมื่อใกล้รถ (ช่อง)', rewardApples:'ต่อรถเสร็จ ได้แอปเปิล (ลูก)', pickup:'การเก็บของ', magnet:'ของลอยเข้าหาตัวจากระยะ (ช่อง)', streakWindow:'เก็บต่อเนื่อง เสียงไล่ขึ้น ถ้าเก็บห่างกันไม่เกิน (วินาที)', quest:'มินิเกมภารกิจ', levels:'จำนวนด่านต่อเกม', stars:'ดาวสูงสุดต่อด่าน', hintRungs:'จำนวนขั้นคำใบ้', sinkDelay:'บล็อกจมหลังเหยียบ (วินาที)', codeStepMs:'เกมโค้ด: เวลาต่อคำสั่ง (มิลลิวินาที)', codeMaxSteps:'เกมโค้ด: คำสั่งสูงสุด', digLayers:'เกมขุด: จำนวนชั้นดิน', peekMs:'เวลาแอบดูแบบ (มิลลิวินาที)', codeMaxLoop:'เกมโค้ด: วนซ้ำได้สูงสุด (รอบ)', codeFreeA:'เกมโค้ด: ด่านอิสระ 4-6 ปี (ก้อน)', codeFreeB:'เกมโค้ด: ด่านอิสระ 7-9 ปี (ก้อน)', codeFreeC:'เกมโค้ด: ด่านอิสระ 10-12 ปี (ก้อน)', blueprintFree:'เกมแบบแปลน: ด่านอิสระ (ก้อน)', digMaxPerEra:'เกมขุด: ของสูงสุดต่อยุค', digFree:'เกมขุด: ด่านอิสระ (ชิ้น)', escapeFree:'เกมหนีห้อง: ด่านอิสระ (แผ่น)', escapeHit:'เกมหนีห้อง: ระยะเหยียบแผ่น (ช่อง)', wrongTool:'เครื่องมือผิด ขุดเร็ว ×', swingEvery:'ขุด 1 ที ทุกกี่วินาที', tiredSlow:'หมดแรง ขุดช้าลง ×' };
+const name = id => TH[id] || id;
+const DEF = snapshot();                                          // code defaults, before any saved data
+let D = JSON.parse(JSON.stringify(DEF)), saved = null;
+try{ const r = await fetch('data/game-data.json', { cache: 'no-store' }); if (r.ok){ saved = await r.json(); merge(D, saved); } }catch(e){}
+let tryCopy = null; try{ tryCopy = JSON.parse(localStorage.getItem('fc-data-try') || 'null'); }catch(e){}
+if (tryCopy) merge(D, tryCopy);
+document.getElementById('src').textContent = tryCopy ? 'มีค่าที่กำลังลองอยู่ (ยังไม่บันทึก)' : saved ? 'ใช้ค่าจากไฟล์ data/game-data.json' : 'ใช้ค่าเริ่มต้นของเกม';
+function merge(a, b){ for (const k in b){ if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') merge(a[k], b[k]); else a[k] = b[k]; } }
+
+// ---- the maths the readouts use (same rules as the game) ----
+const swing = () => D.tuning.dig.swingEvery;
+const blockOf = id => BLOCKS.find(b => b.id === id);
+function digHits(toolId, blockId){ const b = blockOf(blockId), hard = D.blocks[blockId]?.hard ?? b.hard, it = ITEMS[toolId];
+  const right = it && it.tool && it.tool === b.tool, sp = right ? (D.items[toolId]?.dig ?? 4) : D.tuning.dig.wrongTool;
+  if (b.needs && !right) return { n: Math.ceil(hard / sp / swing()), drop: false };
+  return { n: Math.max(1, Math.ceil(hard / sp / swing())), drop: true, sec: hard / sp }; }
+const hitsToKill = (dmg, hp) => Math.ceil(hp / Math.max(.01, dmg));
+const KIND_IDS = Object.keys(D.critters).filter(k => k !== 'frost');
+
+const TABS = [['weapons','อาวุธและเครื่องมือ'],['blocks','บล็อก'],['critters','มอนสเตอร์'],['player','ตัวละคร พลังงาน มินิเกม'],['recipes','สูตรประดิษฐ์']];
+let tab = (location.hash || '#weapons').slice(1);
+const tabsEl = document.getElementById('tabs');
+TABS.forEach(([k, t]) => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => { tab = k; location.hash = k; render(); }; b.dataset.k = k; tabsEl.appendChild(b); });
+
+function inp(path, val, step = .1, w){ const i = document.createElement('input'); i.type = 'number'; i.step = step; i.min = 0; i.value = val; if (w) i.style.width = w;
+  const def = path.reduce((o, k) => o?.[k], DEF); if (def !== undefined && +val !== +def) i.classList.add('changed');
+  i.oninput = () => { const v = parseFloat(i.value); if (!isFinite(v) || v < 0) return; let o = D; path.slice(0, -1).forEach(k => o = o[k] ??= {}); o[path.at(-1)] = v; i.classList.toggle('changed', def !== undefined && v !== +def); outs(); };
+  return i; }
+const chip = (txt, n, cls = '') => `<span class="chip ${cls}">${txt} <b>${n}</b></span>`;
+let outs = () => {};
+
+function render(){
+  [...tabsEl.children].forEach(b => b.classList.toggle('on', b.dataset.k === tab));
+  const main = document.getElementById('main'); main.innerHTML = '';
+  const card = document.createElement('div'); card.className = 'card'; main.appendChild(card);
+  const rows = []; const tbl = (head) => { card.insertAdjacentHTML('beforeend', `<table><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody></tbody></table>`); return card.querySelector('tbody'); };
+  const row = (tb, cells, outFn) => { const tr = document.createElement('tr'); cells.forEach(c => { const td = document.createElement('td'); if (typeof c === 'string') td.innerHTML = c; else td.appendChild(c); tr.appendChild(td); });
+    const o = document.createElement('td'); o.className = 'out'; tr.appendChild(o); tb.appendChild(tr); rows.push(() => o.innerHTML = outFn()); };
+  if (tab === 'weapons'){
+    card.insertAdjacentHTML('beforeend', '<h2>อาวุธและเครื่องมือ</h2><p class="lead">พลังโจมตีต่อ 1 ที ระยะตี (1.5 = หนึ่งช่องรอบตัว) และความเร็วขุดของเครื่องมือ ช่องขวามือคำนวณให้ว่าต้องตีกี่ที</p>');
+    const tb = tbl(['ไอเท็ม', 'พลังโจมตี', 'ระยะตี', 'ขุดเร็ว ×', 'ใช้ได้ (ครั้ง)', 'ผลลัพธ์']);
+    for (const [id, o] of Object.entries(D.items)){ if (o.dmg === undefined && o.dig === undefined && o.dur === undefined) continue;
+      const it = ITEMS[id];
+      row(tb, [`<div class="name"><b>${name(id)}</b><small>${id}${it.tool ? ' · เครื่องมือ' : ' · อาวุธ'}</small></div>`, o.dmg !== undefined ? inp(['items', id, 'dmg'], o.dmg, 1) : '–', o.reach !== undefined ? inp(['items', id, 'reach'], o.reach, .1) : '–', o.dig !== undefined ? inp(['items', id, 'dig'], o.dig, .5) : '<small>ขุดไม่ได้</small>', o.dur !== undefined ? inp(['items', id, 'dur'], o.dur, 10) : '–'],
+        () => { let h = KIND_IDS.map(k => chip(name(k), hitsToKill(D.items[id].dmg ?? 1, D.critters[k].hp) + ' ที')).join('');
+          if (it.tool){ const tgt = { axe: 'log', pickaxe: 'stone', shovel: 'soil' }[it.tool]; if (tgt){ const r = digHits(id, tgt); h += chip(name(tgt), r.n + ' ที', 'good'); } }
+          else h += chip('ขุด', 'ไม่ได้', 'no'); return h; });
+    }
+  }
+  if (tab === 'blocks'){
+    card.insertAdjacentHTML('beforeend', '<h2>บล็อก</h2><p class="lead">ความแข็งของบล็อก ยิ่งมากยิ่งต้องตีหลายที ดูผลได้ทั้งตอนใช้เครื่องมือที่ถูกและตอนใช้มือเปล่า</p>');
+    const tb = tbl(['บล็อก', 'ความแข็ง', 'เครื่องมือที่ถูก', 'ผลลัพธ์']);
+    for (const [id, o] of Object.entries(D.blocks)){ const b = blockOf(id); const tool = Object.keys(ITEMS).find(k => ITEMS[k].tool === b.tool);
+      row(tb, [`<div class="name"><b>${name(id)}</b><small>${id}</small></div>`, inp(['blocks', id, 'hard'], o.hard, .1), tool ? name(tool) : '<small>อะไรก็ได้</small>'],
+        () => { let h = ''; if (tool){ const r = digHits(tool, id); h += chip(name(tool), r.n + ' ที', 'good'); } const r2 = digHits('hand', id); h += r2.drop ? chip('มือเปล่า', r2.n + ' ที', 'slow') : chip('มือเปล่า', 'ไม่ได้ของ', 'no'); return h; });
+    }
+  }
+  if (tab === 'critters'){
+    card.insertAdjacentHTML('beforeend', '<h2>มอนสเตอร์</h2><p class="lead">เลือด ความเร็ว ระยะมองเห็น (ช่อง) เวลาเกิดใหม่ (วินาที) และระยะเดินห่างจากจุดเกิด</p>');
+    const tb = tbl(['มอนสเตอร์', 'เลือด', 'ความเร็ว', 'มองเห็น', 'เกิดใหม่', 'เดินห่าง', 'ผลลัพธ์']);
+    for (const [id, o] of Object.entries(D.critters)){
+      row(tb, [`<div class="name"><b>${name(id)}</b><small>${id}</small></div>`, inp(['critters', id, 'hp'], o.hp, 1, '64px'), inp(['critters', id, 'speed'], o.speed, .1, '64px'), inp(['critters', id, 'sight'], o.sight, 1, '64px'), inp(['critters', id, 'respawn'], o.respawn, 1, '64px'), inp(['critters', id, 'roam'], o.roam, 1, '64px')],
+        () => ['hand', 'sword', 'axe'].map(w => chip(name(w), hitsToKill(D.items[w]?.dmg ?? 1, D.critters[id].hp) + ' ที')).join(''));
+    }
+  }
+  if (tab === 'player'){
+    card.insertAdjacentHTML('beforeend', '<h2>ตัวละครและพลังงาน</h2><p class="lead">พลังงานเต็ม = ' + D.tuning.player.stamina + ' หน่วย ค่าที่ "ใช้" คือพลังงานที่หายไปต่อครั้งหรือต่อวินาที</p>');
+    const tb = tbl(['ค่า', 'ตัวเลข', 'ผลลัพธ์']);
+    for (const [g, fs] of Object.entries(D.tuning)) for (const [f, v] of Object.entries(fs)){
+      row(tb, [`<div class="name"><b>${TUNE_TH[f] || f}</b><small>${TUNE_TH[g] || g} · ${f}</small></div>`, inp(['tuning', g, f], v, .1)], () => {
+        const T = D.tuning; if (g === 'player' && f === 'hp') return chip('หัวใจ', (T.player.hp / 2) + ' ดวง');
+        if (g === 'stamina' && f === 'hit') return chip('ตีได้ก่อนหมดแรง', Math.floor(T.player.stamina / Math.max(.01, v)) + ' ที');
+        if (g === 'stamina' && f === 'runPerSec') return chip('วิ่งได้นาน', Math.round(T.player.stamina / Math.max(.01, v)) + ' วิ');
+        if (g === 'stamina' && f === 'restSit') return chip('นั่งจนเต็ม', Math.round(T.player.stamina / Math.max(.01, v)) + ' วิ');
+        return ''; });
+    }
+  }
+  if (tab === 'recipes'){
+    card.insertAdjacentHTML('beforeend', '<h2>สูตรประดิษฐ์</h2><p class="lead">ของที่ได้ จำนวน และวัตถุดิบ เขียนแบบ <code>planks:2, stone:3</code></p>');
+    const tb = tbl(['ได้', 'จำนวน', 'วัตถุดิบ', 'ผลลัพธ์']);
+    D.recipes.forEach((r, i) => { const t = document.createElement('input'); t.type = 'text'; t.value = Object.entries(r.need).map(([k, n]) => k + ':' + n).join(', ');
+      t.oninput = () => { const need = {}; let ok = true; t.value.split(',').forEach(p => { const [k, n] = p.split(':').map(x => x.trim()); if (ITEMS[k] && +n >= 1) need[k] = +n; else if (p.trim()) ok = false; }); t.style.borderColor = ok ? '' : '#E5484D'; if (ok && Object.keys(need).length){ r.need = need; outs(); } };
+      row(tb, [`<div class="name"><b>${name(r.out)}</b><small>${r.out}</small></div>`, inp(['recipes', i, 'n'], r.n, 1, '64px'), t], () => Object.entries(D.recipes[i].need).map(([k, n]) => chip(name(k), '×' + n)).join('')); });
+  }
+  outs = () => rows.forEach(f => f()); outs();
+  card.insertAdjacentHTML('beforeend', '<p class="note">ช่องที่ขอบสีทองคือค่าที่ต่างจากค่าเริ่มต้นของเกม · "ลองในเกม" เปิดเกมด้วยค่าใหม่โดยยังไม่บันทึก · "บันทึก" เขียนลงไฟล์ data/game-data.json (ทำได้จากเครื่องนี้เท่านั้น)</p>');
+}
+render();
+
+const toast = t => { const e = document.getElementById('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(e.t); e.t = setTimeout(() => e.classList.remove('on'), 2600); };
+document.getElementById('try').onclick = () => { localStorage.setItem('fc-data-try', JSON.stringify(D)); window.open('game.html?room=home', '_blank'); toast('เปิดเกมด้วยค่าที่กำลังลองแล้ว'); document.getElementById('src').textContent = 'มีค่าที่กำลังลองอยู่ (ยังไม่บันทึก)'; };
+document.getElementById('save').onclick = async () => {
+  try{ const r = await fetch('fc/data', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(D) });
+    if (r.status === 204){ localStorage.removeItem('fc-data-try'); toast('บันทึกแล้ว เกมจะใช้ค่านี้ทุกครั้ง'); document.getElementById('src').textContent = 'ใช้ค่าจากไฟล์ data/game-data.json'; }
+    else toast('บันทึกไม่ได้: ' + (await r.text() || r.status)); }catch(e){ toast('บันทึกไม่ได้: เซิร์ฟเวอร์ไม่ตอบ'); } };
+document.getElementById('reset').onclick = () => { if (!confirm('คืนค่าทั้งหมดเป็นค่าเริ่มต้นของเกม? (ยังไม่บันทึกจนกว่าจะกดบันทึก)')) return; localStorage.removeItem('fc-data-try'); D = JSON.parse(JSON.stringify(DEF)); render(); toast('คืนค่าเริ่มต้นแล้ว กดบันทึกถ้าจะใช้ถาวร'); };
+</script>
+</body>
+</html>

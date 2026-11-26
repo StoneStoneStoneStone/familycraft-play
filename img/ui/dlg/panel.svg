@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="96" viewBox="0 0 120 96">
+  <defs>
+    <linearGradient id="oak" x2="0%" y2="100%">
+      <stop stop-color="#F1BD80"/><stop offset=".3" stop-color="#E0A86C"/><stop offset="1" stop-color="#A86A40"/>
+    </linearGradient>
+    <linearGradient id="paper" x2="0%" y2="100%">
+      <stop stop-color="#F5E6D3"/><stop offset=".22" stop-color="#FFF8EC"/><stop offset=".78" stop-color="#FFF8EC"/><stop offset="1" stop-color="#F5E6D3"/>
+    </linearGradient>
+  </defs>
+  <path d="M19 2H101Q118 2 118 19V77Q118 94 101 94H19Q2 94 2 77V19Q2 2 19 2Z" fill="url(#oak)" stroke="#5A3414" stroke-width="4"/>
+  <path d="M6 21V19Q6 6 19 6H101Q114 6 114 19V21" fill="none" stroke="#FFE0AD" stroke-width="2" opacity=".85"/>
+  <path d="M21 15H99Q105 15 105 21V75Q105 81 99 81H21Q15 81 15 75V21Q15 15 21 15Z" fill="url(#paper)" stroke="#754821" stroke-width="2"/>
+  <path d="M18 23Q18 18 23 18H97Q102 18 102 23" fill="none" stroke="#FFFDFC" stroke-width="2"/>
+  <path d="M13 11Q26 8 37 10T60 10M66 9Q77 11 89 9T107 11M13 86Q25 89 38 86T62 87M70 87Q81 89 92 86T107 86M8 24Q6 39 8 48T8 72M112 24Q114 39 112 49T112 72" fill="none" stroke="#754821" stroke-width="1.4" stroke-linecap="round" opacity=".44"/>
+  <path d="M13 13a3 3 0 1 0-6 0a3 3 0 1 0 6 0M113 13a3 3 0 1 0-6 0a3 3 0 1 0 6 0M13 83a3 3 0 1 0-6 0a3 3 0 1 0 6 0M113 83a3 3 0 1 0-6 0a3 3 0 1 0 6 0" fill="#FFC94D" stroke="#754821" stroke-width="1"/>
+  <path d="M9 12h1m99 0h1M9 82h1m99 0h1" stroke="#FFF0B6" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

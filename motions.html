@@ -1,0 +1,66 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FamilyCraft Motion Check</title><link rel="stylesheet" href="css/brand.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F9FAFB;color:#2B2118;font-family:var(--fc-font-body);color-scheme:light}
+header{padding:16px 20px 6px;max-width:1200px;margin:0 auto}h1{font:700 26px var(--fc-font-head);margin:0}header p{margin:4px 0 0;color:#7A6A5A;font-size:14px}
+.bar{position:sticky;top:0;z-index:3;background:rgba(249,250,251,.95);border-bottom:1px solid #EFE7DC}
+.row{max-width:1200px;margin:0 auto;padding:8px 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row b{font-size:13px;color:#7A6A5A;margin-right:4px}
+button{font:600 14px var(--fc-font-body);padding:7px 14px;border-radius:999px;border:2px solid #E2D6C4;background:#fff;color:#3A1F08;cursor:pointer}
+button.on{background:#3A1F08;color:#fff;border-color:#3A1F08}
+.grid{max-width:1200px;margin:14px auto 40px;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:#fff;border:1px solid #EFE7DC;border-radius:18px;overflow:hidden;box-shadow:0 10px 26px rgba(90,60,30,.06)}
+.card canvas{display:block;width:100%;aspect-ratio:1/1.1;background:linear-gradient(#cfeaff,#eef8ff)}
+.card div{padding:8px 12px;font:600 15px var(--fc-font-head);display:flex;justify-content:space-between}.card small{font:500 12px var(--fc-font-body);color:#7A6A5A}
+</style></head><body>
+<header><h1>ตรวจท่าทางตัวละคร</h1><p>ตัวละครทุกตัวทำท่าเดียวกันพร้อมกัน เลือกท่าและมุมกล้องด้านล่าง ลากบนภาพเพื่อหมุนดูรอบตัว</p></header>
+<div class="bar"><div class="row" id="poses"><b>ท่า</b></div><div class="row" id="views"><b>มุม</b></div><div class="row" id="holds"><b>ถือ</b></div></div>
+<div class="grid" id="grid"></div>
+<script type="module">
+import * as THREE from 'three';
+import { CHARACTERS, loadCharacter, Animator } from './engine/entity/character.js';
+import { wear } from './engine/entity/wearables.js';
+const POSES = [['idle','ยืน'],['walk','เดิน'],['jump','กระโดด'],['raise90','ยกแขน 90°'],['raise150','ยกแขน 150°'],['sit','นั่ง'],['punch','ชก'],['slash','ฟันดาบ'],['mine','ขุด'],['eat','กิน']];
+const VIEWS = [['front','หน้า',0],['q','เฉียง',.8],['side','ข้าง',Math.PI/2],['back','หลัง',Math.PI]];
+const HOLDS = [['hand','มือเปล่า'],['sword','ดาบ'],['pickaxe','อีเต้อ'],['hat','+ หมวก']];
+let pose = 'idle', yaw = .5, hold = 'hand', hat = false;
+const cards = [];
+const mk = (el, list, cur, fn) => list.forEach(([k, t]) => { const b = document.createElement('button'); b.textContent = t; b.dataset.k = k; b.classList.toggle('on', k === cur); b.onclick = () => fn(k, b); el.appendChild(b); });
+const mark = (el, k) => [...el.querySelectorAll('button')].forEach(b => b.classList.toggle('on', b.dataset.k === k));
+mk(document.getElementById('poses'), POSES, pose, k => { pose = k; cards.forEach(c => c.t0 = performance.now()); mark(document.getElementById('poses'), k); });
+mk(document.getElementById('views'), VIEWS, '', k => { yaw = VIEWS.find(v => v[0] === k)[2]; mark(document.getElementById('views'), k); });
+mk(document.getElementById('holds'), HOLDS, hold, (k, b) => { if (k === 'hat'){ hat = !hat; b.classList.toggle('on', hat); cards.forEach(c => c.m && wear(c.m, c.m.userData.bones, hat ? 'explorer' : null)); } else { hold = k; [...document.querySelectorAll('#holds button')].forEach(x => { if (x.dataset.k !== 'hat') x.classList.toggle('on', x.dataset.k === k); }); } });
+for (const def of CHARACTERS){
+  const card = document.createElement('div'); card.className = 'card'; card.innerHTML = `<canvas></canvas><div>${def.th}<small>${def.en} · ${def.id}</small></div>`; document.getElementById('grid').appendChild(card);
+  const cv = card.querySelector('canvas'), r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(2, devicePixelRatio)); r.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene(); scene.add(new THREE.HemisphereLight('#fff6e8', '#9ab38a', 1.7)); const sun = new THREE.DirectionalLight('#fff', 2.6); sun.position.set(2, 5, 3); scene.add(sun);
+  const cam = new THREE.PerspectiveCamera(32, 1 / 1.1, .1, 50), root = new THREE.Group(); scene.add(root);
+  const gnd = new THREE.Mesh(new THREE.CircleGeometry(1.6, 40), new THREE.MeshStandardMaterial({ color: '#7fc46c', roughness: 1 })); gnd.rotation.x = -Math.PI / 2; scene.add(gnd);
+  const c = { def, r, scene, cam, root, cv, anim: new Animator(scene), m: null, t0: performance.now(), phase: 0 }; cards.push(c);
+  loadCharacter(def).then(m => { if (!m) return; c.m = m; root.add(m); });
+  let drag = null; cv.addEventListener('pointerdown', e => { drag = e.clientX; cv.setPointerCapture(e.pointerId); }); cv.addEventListener('pointermove', e => { if (drag !== null){ yaw += (e.clientX - drag) * .01; drag = e.clientX; mark(document.getElementById('views'), ''); } }); cv.addEventListener('pointerup', () => drag = null);
+}
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  for (const c of cards){ const w = c.cv.clientWidth, h = c.cv.clientHeight; if (c.cv.width !== Math.round(w * c.r.getPixelRatio())) c.r.setSize(w, h, false);
+    const H = c.def.size, tt = (now - c.t0) / 1000; let action = null, speed = 0, ground = true, vy = 0;
+    if (pose === 'walk'){ speed = 3; c.phase += dt * 7; }
+    else if (pose === 'jump'){ const k = (tt % 1.4) / 1.4; ground = k > .7; vy = k < .35 ? 4 : -4; c.root.position.y = ground ? 0 : Math.sin(k / .7 * Math.PI) * .6; }
+    else if (pose === 'raise90') action = { type: 'raise', deg: 90, t: 1, dur: 1 };
+    else if (pose === 'raise150') action = { type: 'raise', deg: 150, t: 1, dur: 1 };
+    else if (pose === 'sit') action = { type: 'sit', t: 0, dur: 1 };
+    else if (pose === 'mine') action = { type: 'mine', t: 0, dur: 99 };
+    else if (pose === 'eat') action = { type: 'eat', t: 0, dur: 99 };
+    else if (pose === 'punch'){ const d = .3; action = { type: 'punch', t: tt % (d + .5), dur: d }; if (action.t > d) action = null; }
+    else if (pose === 'slash'){ const d = .42; action = { type: 'slash', t: tt % (d + .6), dur: d }; if (action.t > d) action = null; }
+    if (pose !== 'jump') c.root.position.y = 0;
+    const hd = pose === 'slash' ? 'sword' : pose === 'mine' ? (hold === 'hand' ? 'pickaxe' : hold) : pose === 'eat' ? 'apple' : hold;
+    if (c.m) c.anim.update(dt, { model: c.m, speed, phase: c.phase, ground, vy, action, hold: hd, face: 0, t: now / 1000 });
+    c.cam.position.set(Math.sin(yaw) * H * 2.25, H * .72, Math.cos(yaw) * H * 2.25); c.cam.lookAt(0, H * .52, 0); c.r.render(c.scene, c.cam); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+window.__m = { set: (p, y) => { pose = p; if (y !== undefined) yaw = y; cards.forEach(c => c.t0 = performance.now()); }, cards };
+</script></body></html>

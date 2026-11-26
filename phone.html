@@ -1,0 +1,18 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>เล่นบนมือถือ</title><link rel="stylesheet" href="css/brand.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F9FAFB;font-family:var(--fc-font-body);color:#2B2118;text-align:center}
+.c{background:#fff;border:1px solid #EFE7DC;border-radius:22px;padding:24px 28px;box-shadow:0 14px 34px rgba(90,60,30,.08);max-width:92vw}
+h1{font:700 24px var(--fc-font-head);margin:0 0 6px}p{margin:6px 0;color:#7A6A5A}
+.row{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;margin-top:14px}.q img{width:190px;height:190px;image-rendering:pixelated;border-radius:12px;border:3px solid var(--fc-ink)}
+.q b{display:block;margin-top:6px}code{font-size:13px;background:#F4F0EA;padding:2px 8px;border-radius:8px;word-break:break-all}</style></head>
+<body><div class="c"><h1>สแกนเพื่อเล่นบนมือถือ</h1><p>มือถือต้องต่อ Wi-Fi เดียวกับ Mac เครื่องนี้</p><div class="row" id="row"></div><p id="u"></p></div>
+<script>
+fetch('fc/ping').then(r => r.json()).then(({ lan }) => {
+  const base = (lan || location.origin) + '/game.html', who = [['strong', 'ต้นกล้า'], ['stark', 'ต้นข้าว'], ['dad', 'พ่อ'], ['mom', 'แม่']];
+  const row = document.getElementById('row');
+  for (const [k, n] of who){ const url = base + '?player=' + k, q = qrcode(0, 'M'); q.addData(url); q.make();
+    row.insertAdjacentHTML('beforeend', `<div class="q">${q.createImgTag(6, 8)}<b>${n}</b></div>`); }
+  document.getElementById('u').innerHTML = 'หรือพิมพ์ <code>' + base + '</code>';
+});
+</script></body></html>

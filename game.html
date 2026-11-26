@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>FamilyCraft</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 3 28 9.5V22.5L16 29 4 22.5V9.5Z%22 fill=%22%236fd04a%22 stroke=%22%235a3414%22 stroke-width=%222%22/%3E%3Cpath d=%22M4 9.5 16 16 28 9.5M16 16V29%22 fill=%22none%22 stroke=%22%235a3414%22 stroke-width=%222%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/brand.css">
+<link rel="stylesheet" href="css/hud.css">
+<link rel="stylesheet" href="css/wood.css">
+<link rel="stylesheet" href="css/npc.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+</head>
+<body class="skin-c">
+
+<canvas id="c"></canvas>
+<div id="load"><div class="clay" style="padding:18px 28px" data-t="load">กำลังปั้นเกาะ…</div></div>
+<div id="pcard" class="hud clay"><div id="who" title="swap"><div class="face"><img id="faceImg" alt="" draggable="false"></div><i class="swap"></i></div><div class="col"><b id="whoName">ต้นกล้า</b><div id="hearts"></div><div id="stam"></div></div></div>
+<div id="rotate" aria-live="polite"><div class="ph"><i></i></div><b data-th="หมุนจอเป็นแนวนอน" data-en="Turn your phone sideways">หมุนจอเป็นแนวนอน</b><small data-th="เกมนี้เล่นแนวนอน จะเห็นเกาะได้กว้างกว่า" data-en="This game plays in landscape so you can see more of the island">เกมนี้เล่นแนวนอน จะเห็นเกาะได้กว้างกว่า</small></div>
+<div id="fade"></div><div id="hurt"></div>
+<div id="hint" class="hud clay" ></div>
+<div id="clock" class="hud" hidden aria-label=""><svg viewBox="0 0 48 48" width="48" height="48"><circle cx="24" cy="24" r="21" fill="#FFF8EC" stroke="#3A1F08" stroke-width="3"/>
+<g transform="rotate(90 24 24)"><circle cx="24" cy="8.5" r="3.6" fill="#FFC94D" stroke="#E5A92E"/></g><circle cx="24" cy="39.5" r="4.2" fill="#FFC94D" stroke="#E5A92E"/>
+<g transform="rotate(255 24 24)"><circle cx="24" cy="8.5" r="3.4" fill="#F2B27A" stroke="#B8683A"/></g><g transform="rotate(300 24 24)"><path d="M26 5.6a3.8 3.8 0 1 0 1.4 6.4 3 3 0 1 1-1.4-6.4z" fill="#8E6BD8"/></g>
+<g class="hand"><path d="M24 24V9" stroke="#3A1F08" stroke-width="3" stroke-linecap="round"/></g><circle cx="24" cy="24" r="3" fill="#3A1F08"/></svg><b></b></div>
+<div id="coins" class="hud clay" aria-label="coins"><svg class="i coin" viewBox="0 0 32 32"><circle cx="16" cy="17" r="12" fill="#E5A92E"/><circle cx="16" cy="15.5" r="12" fill="#FFC94D" stroke="#3A1F08" stroke-width="2"/><circle cx="16" cy="15.5" r="8" fill="none" stroke="#F5A623" stroke-width="2"/><path d="M16 10.5l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#FFF3C4"/><path d="M9 10a9 9 0 0 1 5-3.4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/></svg><span id="coinN">0</span></div>
+<div id="stars" class="hud clay"><svg class="i" viewBox="0 0 32 32" style="width:26px;height:26px;stroke:var(--sun2);fill:var(--sun)"><path d="M16 4l3.7 7.6 8.3 1.2-6 5.9 1.4 8.3L16 23l-7.4 4 1.4-8.3-6-5.9 8.3-1.2z"/></svg><span id="goalN"></span></div>
+<div id="gear" class="hud clay"><svg class="i" viewBox="0 0 32 32"><circle cx="16" cy="16" r="4.5"/><path d="M16 4v4M16 24v4M4 16h4M24 16h4M7.5 7.5l2.8 2.8M21.7 21.7l2.8 2.8M24.5 7.5l-2.8 2.8M10.3 21.7l-2.8 2.8"/></svg></div>
+<div id="togChip" class="hud clay" hidden><i class="dot"></i><span id="togChipTxt"></span></div>
+<div id="set"><div class="card clay"><h2 data-t="set">ตั้งค่า</h2>
+  <small data-t="tog">เล่นด้วยกัน</small>
+  <div id="togBox"><div id="togIdle"><button class="wide hot" id="togMake" data-t="togMake">สร้างห้อง</button>
+    <div class="seg"><input id="togInput" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD" aria-label="code"><button id="togJoinBtn" data-t="togJoin">เข้าห้อง</button></div></div>
+    <div id="togRoom" hidden><div id="togCodeBig"></div><div id="togState" class="tstate"></div><div id="togQr"></div><div id="togVia" class="tvia"></div>
+    <div class="seg"><button id="togCopyBtn" data-t="togCopy">คัดลอกลิงก์</button><button id="togLeaveBtn" data-t="togLeave">ออกจากห้อง</button></div></div></div><small data-t="langL">ภาษา</small>
+  <div class="seg"><button id="lTh">ไทย</button><button id="lEn">English</button></div>
+  <small data-t="skinL">หน้าตาปุ่ม</small>
+  <div id="skins"><button data-s="a"><i style="background:#ea7658;border:4px solid #fff3df"></i><span data-t="skA">ดินปั้น</span></button><button data-s="b"><i style="background:radial-gradient(circle at 50% 28%,#8dffd9,#1ed39a 55%,#0f9c78);border:4px solid #18235c"></i><span data-t="skB">ลูกกวาด</span></button><button data-s="c"><i style="background:radial-gradient(circle at 50% 30%,#ff9a80,#d9472b 60%,#9c2410);box-shadow:0 0 0 3px #e9b949,0 0 0 5px #7a5417"></i><span data-t="skC">ช่างไม้</span></button></div>
+  <small data-t="soundL">เสียง</small>
+  <div class="seg"><button id="sOn" data-t="on">เปิด</button><button id="sOff" data-t="off">ปิด</button></div>
+  <small data-t="music">เพลง</small>
+  <div class="seg"><button id="mOn" data-t="on">เปิด</button><button id="mOff" data-t="off">ปิด</button></div>
+  <a class="wide hot" id="backFJ" hidden data-t="backFJ">กลับ Family Journey</a><a class="wide" href="game.html?room=home" data-t="goHome">เกาะบ้าน</a><a class="wide" href="game.html?room=tower" data-t="goTower">ภารกิจหอคอย</a><a class="wide" href="index.html" data-t="mission">ไปภารกิจกันน้ำท่วม</a><a class="wide" href="wardrobe.html" data-t="wardrobe">ร้านแต่งตัว</a><a class="wide" href="parent.html" data-t="parent">หน้าพ่อแม่</a><button class="wide" id="setX" data-t="close">กลับไปเล่น</button></div></div>
+<div id="bar" class="hud clay"></div>
+<div id="joy"><div id="knob"></div></div>
+<div id="act">
+  <button class="btn" id="bJump" aria-label="jump"><svg class="ic" viewBox="0 0 32 32"><path d="M16 3 28.5 16.5H21V28.5H11V16.5H3.5Z"/></svg></button>
+  <button class="btn" id="bMine" aria-label="use what you hold"></button>
+  <button class="btn" id="bUse" aria-label="bag"></button>
+  <button class="btn" id="bSit" aria-label="sit"><svg class="ic" viewBox="0 0 32 32"><circle cx="17" cy="6.5" r="3.5"/><path d="M15 11h4l1 8h6l-1.5 9H21l1-5h-7.5L12 13Z"/><path class="ln" d="M6 20v8M6 24h8"/></svg></button>
+</div>
+<div id="bView" class="hud clay" aria-label="view"><svg class="i" viewBox="0 0 32 32"><path d="M3 16s5-8 13-8 13 8 13 8-5 8-13 8S3 16 3 16Z"/><circle cx="16" cy="16" r="4"/></svg></div>
+<div id="cross"></div>
+<div id="craftP"><div class="card clay"><h2 data-t="craft">ประดิษฐ์</h2><small data-t="craftHint">มีของครบ กดเพื่อสร้าง</small><div id="craftList"></div><button class="wide" id="craftX" data-t="close">กลับไปเล่น</button></div></div>
+<div id="bagP"><div class="card clay"><h2 data-t="bag">กระเป๋า</h2><small data-t="bagHint">แตะของ แล้วแตะอีกช่องเพื่อสลับ</small><div id="bagGrid"></div><button class="wide" id="bagX" data-t="close">กลับไปเล่น</button></div></div>
+<script src="fc-config.js"></script>
+<script type="module" src="engine/main.js"></script>
+</body>
+</html>

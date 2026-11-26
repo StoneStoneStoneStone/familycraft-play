@@ -1,0 +1,28 @@
+/* FamilyCraft CI: the locked mood and tone. Every page (game, home, parents) uses these tokens.
+   Mood: a sunny block island, warm wood and leaf, soft cream paper, clear sky. Friendly, crafted, calm.
+   Change a colour here, not in each file. See brand.html for the visual sheet. */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Pixelify+Sans:wght@600&family=Mitr:wght@500;600&family=Prompt:wght@400;500;600;700&display=swap');
+:root{
+  /* core palette */
+  --fc-leaf:#6BAF5D;   --fc-leaf-dark:#3F7F3A;  --fc-leaf-light:#A8DB8C;
+  --fc-oak:#B57A4E;    --fc-oak-light:#E0A86C;  --fc-oak-dark:#7A4A22;
+  --fc-bark:#5A3414;   --fc-ink:#3A1F08;
+  --fc-cream:#F5E6D3;  --fc-paper:#FFF8EC;  --fc-white:#F9FAFB;  /* page background: airy white, cream only for cards */
+  --fc-sky:#A7D8FF;    --fc-sky-dark:#4A9BD8;
+  /* accents, used sparingly: one job each */
+  --fc-sun:#FFC94D;    /* stars, rewards, selection */
+  --fc-berry:#E5484D;  /* hearts, hit and dig */
+  --fc-teal:#2FB39E;   /* jump, go, play together */
+  --fc-plum:#8E6BD8;   /* rare items, magic */
+  /* type: rounded, friendly headings (Fredoka; Thai falls back to Mitr), clean body. Pixel font only for small decorative tags, never numbers */
+  --fc-font-head:'Fredoka','Mitr','Prompt',system-ui,sans-serif;
+  --fc-font-pixel:'Pixelify Sans','Mitr',sans-serif;
+  --fc-font-body:'Prompt','Sukhumvit Set',system-ui,sans-serif;
+  /* shape */
+  --fc-r-sm:10px; --fc-r-md:16px; --fc-r-lg:24px; --fc-r-pill:999px;
+  --fc-edge:3px solid var(--fc-ink);
+  --fc-drop:0 5px 0 var(--fc-ink),0 12px 18px rgba(40,20,5,.35);
+  /* wood surfaces */
+  --fc-wood:repeating-linear-gradient(92deg,rgba(90,50,15,.16) 0 2px,transparent 2px 13px,rgba(255,220,160,.1) 13px 15px,transparent 15px 31px),linear-gradient(#D69A58,#B57A4E 55%,#9E6436);
+  --fc-wood-round:repeating-conic-gradient(from 7deg,rgba(80,42,10,.2) 0 2deg,transparent 2deg 19deg),radial-gradient(circle closest-side,#EDB678 0 62%,#C98A4A 82%,#8F5424 100%);
+}

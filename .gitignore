@@ -1,0 +1,7 @@
+.DS_Store
+# not needed on the website (work files, kept on this Mac)
+design/
+models/old*/
+tests/out*/
+*.blend
+*.blend1

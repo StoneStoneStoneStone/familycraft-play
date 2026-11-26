@@ -1,0 +1,114 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>FamilyCraft Dress-up Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Mitr:wght@500;600&family=Prompt:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/brand.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<style>
+/* Dress-up shop (owner 2026-11-27): try things on a live 3D character, buy with coins, wear in the game. Landscape first. */
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}
+body{background:linear-gradient(#cfeaff,#eef8ff);color:var(--fc-ink);font-family:var(--fc-font-body);display:flex}
+#stage{flex:1 1 55%;position:relative;min-width:0}
+#stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#who{position:absolute;left:14px;bottom:14px;display:flex;gap:8px;flex-wrap:wrap;max-width:calc(100% - 28px)}
+#who button{width:52px;height:52px;border-radius:50%;border:3px solid var(--fc-ink);background:var(--fc-paper);padding:0;overflow:hidden;cursor:pointer;box-shadow:0 3px 0 var(--fc-ink)}
+#who button.on{background:var(--fc-sun);transform:translateY(-3px)}
+#who button img{width:100%;height:100%;object-fit:cover}
+#back{position:absolute;left:14px;top:14px;font:700 16px var(--fc-font-head);padding:10px 18px;border-radius:var(--fc-r-pill);border:3px solid var(--fc-ink);background:var(--fc-paper);color:var(--fc-ink);text-decoration:none;box-shadow:0 4px 0 var(--fc-ink)}
+#panel{flex:0 0 min(440px,45vw);margin:12px 12px 12px 0;border:3px solid var(--fc-ink);border-radius:var(--fc-r-lg);background:var(--fc-wood);box-shadow:var(--fc-drop);display:flex;flex-direction:column;padding:14px;gap:12px;min-height:0}
+#top{display:flex;align-items:center;gap:10px}
+#top h1{flex:1;margin:0;font:700 26px var(--fc-font-head);color:var(--fc-paper);text-shadow:0 2px 0 var(--fc-ink)}
+#purse{display:flex;align-items:center;gap:6px;background:var(--fc-paper);border:3px solid var(--fc-ink);border-radius:var(--fc-r-pill);padding:4px 14px 4px 6px;font:700 22px var(--fc-font-head)}
+#purse svg{width:30px;height:30px}
+#purse.short{animation:no .4s}#purse.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes no{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes pop{40%{transform:scale(1.15)}}
+#tabs{display:flex;gap:6px}
+#tabs button{flex:1;font:600 15px var(--fc-font-head);padding:8px 4px;border-radius:var(--fc-r-md);border:3px solid var(--fc-ink);background:var(--fc-cream);color:var(--fc-ink);cursor:pointer}
+#tabs button.on{background:var(--fc-sun)}#tabs button.soon{opacity:.55}
+#tabs small{display:block;font:500 11px var(--fc-font-body)}
+#items{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;align-content:start;padding:2px}
+.card{border:3px solid var(--fc-ink);border-radius:var(--fc-r-md);background:var(--fc-paper);padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;text-align:center;font:600 13px var(--fc-font-body);position:relative}
+.card.try{outline:4px solid var(--fc-sun);outline-offset:-1px}
+.card .pic{width:64px;height:52px}
+.card .tag{font:700 14px var(--fc-font-head);display:flex;align-items:center;gap:3px}
+.card .tag svg{width:18px;height:18px}
+.card .worn{position:absolute;top:-8px;right:-8px;background:var(--fc-teal);color:#fff;border:2px solid var(--fc-ink);border-radius:var(--fc-r-pill);font:700 11px var(--fc-font-head);padding:2px 8px}
+#soon{display:none;flex:1;align-items:center;justify-content:center;text-align:center;color:var(--fc-paper);font:600 18px var(--fc-font-head);text-shadow:0 2px 0 var(--fc-ink)}
+#act{font:700 20px var(--fc-font-head);padding:12px;border-radius:var(--fc-r-pill);border:3px solid var(--fc-ink);background:var(--fc-teal);color:#fff;box-shadow:0 5px 0 var(--fc-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+#act:disabled{background:var(--fc-cream);color:var(--fc-oak-dark);box-shadow:0 3px 0 var(--fc-ink);cursor:default}
+#act.buy{background:var(--fc-sun);color:var(--fc-ink)}#act svg{width:26px;height:26px}
+#msg{min-height:20px;text-align:center;color:var(--fc-paper);font:600 15px var(--fc-font-head);text-shadow:0 2px 0 var(--fc-ink)}
+#rotate{display:none}
+@media (max-height:500px){#panel{padding:10px;gap:8px}#top h1{font-size:20px}#purse{font-size:18px}#tabs button{font-size:13px;padding:5px 2px}#items{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}.card .pic{width:50px;height:40px}#act{font-size:17px;padding:8px}#who button{width:42px;height:42px}}
+@media (orientation:portrait) and (max-width:720px){#rotate{display:flex;position:fixed;inset:0;z-index:9;background:var(--fc-sky-dark);color:#fff;align-items:center;justify-content:center;text-align:center;font:700 22px var(--fc-font-head);padding:30px}}
+</style></head><body>
+<div id="stage"><canvas id="cv"></canvas><a id="back" href="game.html?room=home">← กลับเกม</a><div id="who"></div></div>
+<div id="panel">
+  <div id="top"><h1 id="title">ร้านแต่งตัว</h1><div id="purse"><svg viewBox="0 0 32 32"><circle cx="16" cy="17" r="12" fill="#E5A92E"/><circle cx="16" cy="15.5" r="12" fill="#FFC94D" stroke="#3A1F08" stroke-width="2"/><circle cx="16" cy="15.5" r="8" fill="none" stroke="#F5A623" stroke-width="2"/><path d="M16 10.5l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="#FFF3C4"/></svg><span id="coinN">0</span></div></div>
+  <div id="tabs"></div>
+  <div id="items"></div><div id="soon"></div>
+  <div id="msg"></div>
+  <button id="act" disabled>เลือกของที่อยากลอง</button>
+</div>
+<div id="rotate">หมุนโทรศัพท์เป็นแนวนอนนะ</div>
+<script type="module">
+import * as THREE from 'three';
+import { CHARACTERS, loadCharacter, Animator } from './engine/entity/character.js';
+import { wear } from './engine/entity/wearables.js';
+import { SLOTS, WARDROBE, owned, own } from './engine/data/wardrobe.js';
+import { loadData } from './engine/data/tuning.js';
+import { Coins } from './engine/core/coins.js';
+import { Bus, store } from './engine/core/core.js';
+import { Telemetry } from './engine/telemetry/telemetry.js';
+await loadData();
+const lang = store.get('fc-lang', 'th') === 'en' ? 'en' : 'th', L = (th, en) => lang === 'en' ? en : th; document.documentElement.lang = lang;
+const tel = new Telemetry({ profile: store.get('fc-profile', 'child'), room: 'wardrobe' });
+const game = { bus: new Bus(), track: (t, d) => tel.track(t, d) }, coins = new Coins(game);
+const COIN = document.querySelector('#purse svg').outerHTML, $ = id => document.getElementById(id);
+$('title').textContent = L('ร้านแต่งตัว', 'Dress-up shop'); $('back').textContent = L('← กลับเกม', '← Back to game');
+// ---- 3D stage: the chosen character turning slowly; drag to spin
+const cv = $('cv'), r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(2, devicePixelRatio)); r.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene(); scene.add(new THREE.HemisphereLight('#fff6e8', '#9ab38a', 1.8)); const sun = new THREE.DirectionalLight('#fff', 2.6); sun.position.set(2, 5, 3); scene.add(sun);
+const gnd = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.2, .16, 40), new THREE.MeshStandardMaterial({ color: '#7fc46c', roughness: 1 })); gnd.position.y = -.08; scene.add(gnd);
+const cam = new THREE.PerspectiveCamera(30, 1, .1, 50), root = new THREE.Group(); scene.add(root);
+const anim = new Animator(scene); let model = null, def = null, spin = 0, drag = null, tried = null, slot = 'hat';
+let wearing = store.get('fc-wear', null);
+cv.addEventListener('pointerdown', e => { drag = e.clientX; cv.setPointerCapture(e.pointerId); }); cv.addEventListener('pointermove', e => { if (drag !== null){ spin += (e.clientX - drag) * .012; drag = e.clientX; } }); cv.addEventListener('pointerup', () => drag = null);
+async function pick(d){ def = d; store.set('fc-avatar', d.id); [...$('who').children].forEach(b => b.classList.toggle('on', b.dataset.id === d.id));
+  const m = await loadCharacter(d); if (def !== d || !m) return; if (model) root.remove(model); model = m; root.add(m); dress(); }
+function dress(){ if (model) wear(model, model.userData.bones, tried ?? wearing); }
+CHARACTERS.forEach(d => { const b = document.createElement('button'); b.dataset.id = d.id; b.title = d[lang] || d.th; b.innerHTML = `<img src="img/face-${d.id}.png" alt="" onerror="this.replaceWith(document.createTextNode('${(d.th || '').slice(0, 2)}'))">`; b.onclick = () => pick(d); $('who').appendChild(b); });
+pick(CHARACTERS.find(d => d.id === store.get('fc-avatar', 'boy')) || CHARACTERS[0]);
+let last = performance.now();
+(function loop(now){ const dt = Math.min(.05, (now - last) / 1000); last = now;
+  const w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * r.getPixelRatio())){ r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+  if (drag === null) spin += dt * .35; root.rotation.y = Math.sin(spin) * .7;   // sways to show the sides, always facing you
+  const H = def ? def.size : 1.5; cam.position.set(0, H * .6, H * 3.2); cam.lookAt(0, H * .5, 0);
+  if (model) anim.update(dt, { model, speed: 0, phase: 0, ground: true, vy: 0, action: null, hold: 'hand', face: 0, t: now / 1000 });
+  r.render(scene, cam); requestAnimationFrame(loop); })(last);
+// ---- shop panel
+const hatSvg = c => `<svg class="pic" viewBox="0 0 64 52"><ellipse cx="32" cy="38" rx="29" ry="8" fill="${c}" stroke="#3A1F08" stroke-width="3"/><path d="M15 37C15 18 22 10 32 10s17 8 17 27Z" fill="${c}" stroke="#3A1F08" stroke-width="3"/><path d="M16 31h32" stroke="#5A3414" stroke-width="5"/><circle cx="44" cy="31" r="3" fill="#FFC94D" stroke="#3A1F08" stroke-width="1.5"/></svg>`;
+const noneSvg = '<svg class="pic" viewBox="0 0 64 52"><circle cx="32" cy="26" r="17" fill="none" stroke="#B57A4E" stroke-width="4"/><path d="M20 38 44 14" stroke="#B57A4E" stroke-width="4" stroke-linecap="round"/></svg>';
+function say(t){ $('msg').textContent = t || ''; }
+function purse(e){ $('coinN').textContent = coins.get(); if (e && e.short){ const p = $('purse'); p.classList.remove('short'); void p.offsetWidth; p.classList.add('short'); } }
+game.bus.on('coins', purse); purse();
+function tabs(){ $('tabs').innerHTML = ''; SLOTS.forEach(s => { const b = document.createElement('button'); b.className = (s.id === slot ? 'on ' : '') + (s.soon ? 'soon' : ''); b.innerHTML = L(s.th, s.en) + (s.soon ? `<small>${L('เร็ว ๆ นี้', 'soon')}</small>` : ''); b.onclick = () => { slot = s.id; tried = null; dress(); draw(); }; $('tabs').appendChild(b); }); }
+function draw(){ tabs(); const s = SLOTS.find(x => x.id === slot), list = $('items'), mine = owned();
+  $('soon').style.display = s.soon ? 'flex' : 'none'; list.style.display = s.soon ? 'none' : 'grid';
+  if (s.soon){ $('soon').textContent = L('ของหมวดนี้กำลังออกแบบอยู่ เร็ว ๆ นี้!', 'Coming soon!'); act(); return; }
+  list.innerHTML = '';
+  const none = document.createElement('div'); none.className = 'card' + (tried === '' ? ' try' : ''); none.innerHTML = `${noneSvg}<span>${L('ไม่ใส่', 'None')}</span>${!wearing ? `<span class="worn">${L('ใส่อยู่', 'On')}</span>` : ''}`; none.onclick = () => { tried = ''; dress(); draw(); }; list.appendChild(none);
+  WARDROBE.filter(w => w.slot === slot).forEach(w => { const c = document.createElement('div'), p = w.price(), has = mine.has(w.id);
+    c.className = 'card' + (tried === w.id ? ' try' : ''); c.innerHTML = `${hatSvg(w.swatch)}<span>${L(w.th, w.en)}</span><span class="tag">${has ? L('มีแล้ว', 'Owned') : `${COIN}${p}`}</span>${wearing === w.id ? `<span class="worn">${L('ใส่อยู่', 'On')}</span>` : ''}`;
+    c.onclick = () => { tried = w.id; dress(); draw(); say(has ? '' : L('ลองใส่ดูได้เลย ถ้าชอบก็ซื้อนะ', 'Try it on. Buy it if you like it')); }; list.appendChild(c); });
+  act(); }
+function act(){ const b = $('act'); b.className = ''; b.disabled = true; b.onclick = null;
+  if (tried === null){ b.textContent = L('แตะของที่อยากลองใส่', 'Tap something to try it on'); return; }
+  if (tried === ''){ if (!wearing){ b.textContent = L('ไม่ได้ใส่หมวกอยู่แล้ว', 'No hat on'); return; } b.disabled = false; b.textContent = L('ถอดหมวก', 'Take it off'); b.onclick = () => { wearing = null; store.set('fc-wear', null); tried = null; dress(); draw(); say(L('ถอดแล้ว', 'Taken off')); }; return; }
+  const w = WARDROBE.find(x => x.id === tried), p = w.price();
+  if (owned().has(w.id)){ if (wearing === w.id){ b.textContent = L('ใส่อยู่แล้ว', 'Wearing it'); return; }
+    b.disabled = false; b.textContent = L('ใส่เลย', 'Wear it'); b.onclick = () => { wearing = w.id; store.set('fc-wear', w.id); tried = null; dress(); draw(); say(L('ใส่แล้ว! กลับไปเล่นจะเห็นในเกมด้วย', 'On! You will see it in the game too')); game.track('wear_change', { item: w.id }); }; return; }
+  b.disabled = false; b.className = 'buy'; b.innerHTML = `${L('ซื้อ', 'Buy')} ${COIN} ${p}`;
+  b.onclick = () => { if (coins.spend(p, 'shop_' + w.id)){ own(w.id); wearing = w.id; store.set('fc-wear', w.id); tried = null; dress(); draw(); say(L('ซื้อแล้ว และใส่ให้แล้ว!', 'Bought and put on!')); const q = $('purse'); q.classList.remove('pop'); void q.offsetWidth; q.classList.add('pop'); }
+    else say(L(`เหรียญยังไม่พอ ขาดอีก ${p - coins.get()} เหรียญ ไปช่วยลุงบีเวอร์สร้างสะพานได้เหรียญนะ`, `Not enough coins yet: ${p - coins.get()} more. Help Uncle Beaver build bridges to earn some`)); }; }
+draw(); window.__ready = 1;
+</script></body></html>

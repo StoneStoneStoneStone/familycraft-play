@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>เลือกเพลง FamilyCraft</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Mitr:wght@500;600&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/brand.css">
+<style>
+body{margin:0;background:#F9FAFB;color:#3A1F08;font:400 17px/1.5 Prompt,sans-serif}
+main{max-width:880px;margin:0 auto;padding:28px 18px 60px}
+h1{font:700 32px/1.2 Fredoka,Mitr,sans-serif;margin:0 0 6px}h2{font:700 22px/1.2 Fredoka,Mitr,sans-serif;margin:34px 0 10px}
+p.lead{margin:0 0 8px;color:#7a5a3a}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.card{background:#FFF8EC;border:3px solid #3A1F08;border-radius:20px;padding:16px;box-shadow:0 4px 0 #3A1F08;display:flex;flex-direction:column;gap:8px}
+.card b{font:700 22px/1.2 Fredoka,Mitr,sans-serif}.card small{color:#7a5a3a;font-size:15px}
+.card .row{display:flex;gap:8px;margin-top:auto}
+button{font:700 17px/1 Fredoka,Mitr,sans-serif;border:3px solid #3A1F08;border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 3px 0 #3A1F08;color:#3A1F08;background:#fff}
+button.play{background:#FFC94D;flex:1}button.use{background:#F5E6D3}button.use.on{background:#6BAF5D;color:#fff}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #3A1F08}
+.card.playing{outline:4px solid #FFC94D;outline-offset:3px}
+</style></head><body><main>
+<h1>เลือกเพลงประจำเกาะ</h1>
+<p class="lead">กดฟังทีละเพลง แล้วกด "ใช้เพลงนี้" เพลงที่เลือกจะเล่นในเกาะทันทีที่เปิดเกมครั้งหน้า (เพลงทั้งหมดแต่งด้วยโค้ด ไม่ใช้เครดิต)</p>
+<div class="grid" id="island"></div>
+<h2>เพลงตอนคุยกับชาวเกาะ</h2>
+<p class="lead">เล่นอัตโนมัติตอนคุยกับตัวละครนั้น แล้วกลับเป็นเพลงเกาะเมื่อคุยจบ</p>
+<div class="grid" id="talk"></div>
+</main>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+import { Music } from './engine/fx/music.js';
+import { Sound } from './engine/fx/fx.js';
+import { SONGS, ISLAND_SONGS, TALK_SONGS } from './engine/fx/songs.js';
+const sound = new Sound(), music = new Music(sound); music.started = true; let now = null;
+const who = Object.fromEntries(Object.entries(TALK_SONGS).map(([n, s]) => [s, { sing: 'จิ้งจอกซิ่ง' }[n] || n]));
+function card(id, box, island){ const S = SONGS[id], d = document.createElement('div'); d.className = 'card'; d.id = 'c-' + id;
+  d.innerHTML = `<b>${S.th}</b><small>${S.en} · ${S.file ? 'เพลงจริง โดย ' + S.by : S.bpm + ' จังหวะต่อนาที (แต่งด้วยโค้ด)'}</small><div>${S.mood}${who[id] ? '<br><small>ของ ' + who[id] + '</small>' : ''}</div><div class="row"><button class="play">ฟัง</button>${island ? '<button class="use">ใช้เพลงนี้</button>' : ''}</div>`;
+  d.querySelector('.play').onclick = () => { sound.ensure(); if (now === id){ music.stop(); now = null; } else { music.stop(true); music.talk = id; music.start(); now = id; } paint(); };
+  const u = d.querySelector('.use'); if (u) u.onclick = () => { music.choose(id); paint(); };
+  box.appendChild(d); }
+function paint(){ document.querySelectorAll('.card').forEach(c => { const id = c.id.slice(2); c.classList.toggle('playing', id === now); c.querySelector('.play').textContent = id === now ? 'หยุด' : 'ฟัง'; const u = c.querySelector('.use'); if (u){ u.classList.toggle('on', music.song === id); u.textContent = music.song === id ? 'ใช้อยู่' : 'ใช้เพลงนี้'; } }); }
+ISLAND_SONGS.forEach(id => card(id, document.getElementById('island'), true)); Object.values(TALK_SONGS).forEach(id => card(id, document.getElementById('talk'), false)); paint();
+</script></body></html>

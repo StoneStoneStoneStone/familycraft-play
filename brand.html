@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FamilyCraft CI</title>
+<link rel="stylesheet" href="css/brand.css">
+<style>
+:root{--bg:#F9FAFB;--card:#FFFFFF;--text:#2B2118;--muted:#7A6A5A;--line:#EFE7DC;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--fc-font-body);line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 16px 64px}
+h1,h2,h3{font-family:var(--fc-font-head);margin:0;letter-spacing:.3px}
+.eyebrow{font:600 12px var(--fc-font-body);letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+.hero{box-shadow:0 18px 40px rgba(90,60,30,.08);display:grid;grid-template-columns:1fr 1.25fr;gap:28px;align-items:center;background:var(--card);border-radius:var(--fc-r-lg);padding:28px;border:1px solid var(--line)}
+.hero h1{font-size:clamp(36px,6vw,60px);line-height:1;margin:8px 0 14px}
+.hero h1 span{color:var(--fc-leaf)}
+.hero p{margin:0 0 18px;color:var(--muted);max-width:40ch}
+.hero img{width:100%;border-radius:var(--fc-r-md);display:block;box-shadow:0 10px 30px rgba(60,30,5,.25)}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 16px var(--fc-font-body);padding:11px 22px;border-radius:var(--fc-r-pill);border:var(--fc-edge);cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--fc-leaf);color:#fff;box-shadow:0 4px 0 var(--fc-ink);text-shadow:0 1px 0 var(--fc-leaf-dark)}
+.btn.sec{background:var(--fc-paper);color:var(--fc-ink);box-shadow:0 4px 0 var(--fc-ink)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--fc-ink)}
+section{box-shadow:0 18px 40px rgba(90,60,30,.07);margin-top:28px;background:var(--card);border-radius:var(--fc-r-lg);padding:24px;border:1px solid var(--line)}
+section>h2{font-size:24px;margin-bottom:4px}section>.lead{color:var(--muted);margin:0 0 18px}
+.mood{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.mood div{padding:14px;border-radius:var(--fc-r-md);background:var(--bg)}
+.mood b{display:block;font-family:var(--fc-font-head);font-size:18px}.mood small{color:var(--muted)}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.sw div{border-radius:var(--fc-r-md);overflow:hidden;border:1px solid var(--line);background:var(--bg)}
+.sw i{display:block;height:84px}
+.sw p{margin:0;padding:8px 10px;font-size:13px}.sw p b{display:block;font-size:14px}
+.sw.acc i{height:54px}
+.type{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.type div{padding:18px;border-radius:var(--fc-r-md);background:var(--bg)}
+.type .big{font-size:56px;line-height:1}.type .h{font-family:var(--fc-font-head)}
+.ui{display:grid;grid-template-columns:1.2fr 1fr;gap:22px;align-items:center}
+.game{position:relative;background:linear-gradient(#8fdcf7,#c9efff 60%,#6BAF5D 61%,#4f9444);border-radius:var(--fc-r-md);height:260px;overflow:hidden}
+.wb{position:absolute;border-radius:50%;background:var(--fc-wood-round);box-shadow:0 0 0 3px var(--fc-ink),inset 0 3px 0 rgba(255,225,170,.55),0 5px 0 var(--fc-ink);display:grid;place-items:center}
+.wb::before{content:"";position:absolute;inset:13%;border-radius:50%;background:radial-gradient(circle at 50% 30%,var(--g1),var(--g2) 55%,var(--g3));box-shadow:0 0 0 3px var(--fc-ink)}
+.wb::after{content:"";position:absolute;left:27%;right:27%;top:18%;height:24%;border-radius:50%;background:linear-gradient(rgba(255,255,255,.7),transparent)}
+.wb svg{position:relative;z-index:2;width:46%;height:46%}
+.plank{position:absolute;background:var(--fc-wood);border:3px solid var(--fc-ink);border-radius:12px;box-shadow:0 5px 0 var(--fc-ink);color:var(--fc-paper);text-shadow:0 2px 0 var(--fc-bark);font-family:var(--fc-font-head);display:flex;align-items:center;gap:8px;padding:6px 14px}
+.bar{position:absolute;height:12px;border-radius:9px;background:#3a2010;border:2px solid var(--fc-ink);overflow:hidden}.bar i{display:block;height:100%;width:72%;background:linear-gradient(#8ff05a,#3fbf3a 55%,#2a8f2a)}
+.rules{margin:0;padding-left:20px}.rules li{margin:6px 0}
+.dont{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dont div{padding:14px;border-radius:var(--fc-r-md);background:var(--bg)}.dont b{font-family:var(--fc-font-head)}
+.ok b{color:var(--fc-leaf)}.no b{color:var(--fc-berry)}
+code{font-size:13px;background:var(--bg);padding:1px 6px;border-radius:6px}
+@media (max-width:760px){.hero,.ui,.type,.dont{grid-template-columns:1fr}.mood{grid-template-columns:1fr 1fr}.sw{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body><div class="wrap">
+
+<div class="hero">
+  <div>
+    <div class="eyebrow">FamilyCraft · Brand CI v1</div>
+    <h1>Build<br>Together<br><span>Grow</span></h1>
+    <p>เกาะบล็อกอบอุ่นที่พ่อแม่กับลูกสร้างด้วยกัน ทุกหน้าทั้งในเกม หน้าเว็บ และหลังบ้านผู้ปกครอง ใช้สี ฟอนต์ และชิ้นส่วนชุดนี้ชุดเดียว</p>
+    <a class="btn pri" href="game.html">เล่นเลย →</a> <a class="btn sec" href="#ui">ดูชิ้นส่วน UI</a>
+  </div>
+  <img src="img/ci-game.jpg" alt="ภาพในเกม FamilyCraft">
+</div>
+
+<section>
+  <h2>Mood &amp; Tone</h2><p class="lead">สี่คำที่ใช้ตัดสินทุกงานออกแบบ ถ้างานไหนไม่ตรงสี่คำนี้ ให้แก้</p>
+  <div class="mood">
+    <div><b>อบอุ่น · Warm</b><small>ไม้โอ๊ก ครีม แดดยามบ่าย ไม่มีสีดำสนิทหรือเทาเย็น</small></div>
+    <div><b>ทำมือ · Crafted</b><small>ขอบหนา ปุ่มนูน ไม้มีลาย เหมือนของเล่นที่จับได้</small></div>
+    <div><b>สดใส · Bright</b><small>ฟ้าใส ใบไม้เขียว สีชัดแต่ไม่แสบตา</small></div>
+    <div><b>สงบ · Calm</b><small>ไม่กดดัน ไม่มีของน่ากลัว เหมาะเด็ก 7–12 ปี</small></div>
+  </div>
+</section>
+
+<section>
+  <h2>Color Palette</h2><p class="lead">สีหลักห้าสีใช้กับพื้นที่ใหญ่ ส่วนสีเน้นสี่สีมีหน้าที่ของตัวเองสีละหนึ่งอย่าง</p>
+  <div class="sw">
+    <div><i style="background:#6BAF5D"></i><p><b>Leaf</b>#6BAF5D · ปุ่มหลัก ความสำเร็จ</p></div>
+    <div><i style="background:#B57A4E"></i><p><b>Oak</b>#B57A4E · ป้าย แผง ไม้</p></div>
+    <div><i style="background:#F5E6D3"></i><p><b>Cream</b>#F5E6D3 · พื้นหลัง กระดาษ</p></div>
+    <div><i style="background:#A7D8FF"></i><p><b>Sky</b>#A7D8FF · ท้องฟ้า พื้นที่ว่าง</p></div>
+    <div><i style="background:#3A1F08"></i><p><b>Ink</b>#3A1F08 · ตัวอักษร เส้นขอบ</p></div>
+  </div>
+  <div class="sw acc" style="margin-top:12px">
+    <div><i style="background:#FFC94D"></i><p><b>Sun</b>#FFC94D · ดาว รางวัล ช่องที่เลือก</p></div>
+    <div><i style="background:#E5484D"></i><p><b>Berry</b>#E5484D · หัวใจ ตี ขุด</p></div>
+    <div><i style="background:#2FB39E"></i><p><b>Teal</b>#2FB39E · กระโดด เล่นด้วยกัน</p></div>
+    <div><i style="background:#8E6BD8"></i><p><b>Plum</b>#8E6BD8 · ของหายาก เวทมนตร์</p></div>
+    <div><i style="background:#5A3414"></i><p><b>Bark</b>#5A3414 · เงาไม้ ช่องเก็บของ</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Typography</h2><p class="lead">หัวเรื่องใช้ฟอนต์พิกเซลให้รู้สึกเป็นโลกบล็อก ส่วนข้อความยาวใช้ฟอนต์อ่านง่าย</p>
+  <div class="type">
+    <div><div class="big h">Aa ก</div><b class="h">Pixelify Sans + Mitr</b><br><small>หัวเรื่อง ตัวเลข ป้ายในเกม · อักษรไทยใช้ Mitr แทนเอง</small></div>
+    <div><div class="big">Aa ก</div><b>Prompt</b><br><small>เนื้อหา ปุ่ม คำอธิบาย · น้ำหนัก 400–700</small></div>
+  </div>
+</section>
+
+<section id="ui">
+  <h2>UI Components</h2><p class="lead">ในเกมใช้ปุ่มไม้โอ๊กล้อมเม็ดอัญมณี ส่วนหน้าเว็บใช้ปุ่มแบบแคปซูลขอบหมึก</p>
+  <div class="ui">
+    <div class="game">
+      <div class="plank" style="left:12px;top:12px">ต้นกล้า <span style="color:#ff6b74">♥♥♥♥</span></div>
+      <div class="bar" style="left:12px;top:56px;width:150px"><i></i></div>
+      <div class="plank" style="right:12px;top:12px">★ 3/8</div>
+      <div class="wb" style="left:18px;bottom:18px;width:96px;height:96px;--g1:#ff9d8e;--g2:#E5484D;--g3:#9c1f22"></div>
+      <div class="wb" style="right:18px;bottom:18px;width:84px;height:84px;--g1:#ffb3a6;--g2:#E5484D;--g3:#a4171c"><svg viewBox="0 0 32 32"><path d="M5 27 19 13" stroke="#3A1F08" stroke-width="5" stroke-linecap="round"/><path d="M5 27 19 13" stroke="#E0A86C" stroke-width="2.6" stroke-linecap="round"/><path d="M9 7c7-4 14-2 18 4l-3 2c-3-4-8-5-12-3Z" fill="#dfe8f2" stroke="#3A1F08" stroke-width="2"/></svg></div>
+      <div class="wb" style="right:118px;bottom:24px;width:64px;height:64px;--g1:#8ff0de;--g2:#2FB39E;--g3:#13705f"><svg viewBox="0 0 32 32"><path d="M16 3 28.5 16.5H21V28.5H11V16.5H3.5Z" fill="#fff" stroke="#3A1F08" stroke-width="2.4" stroke-linejoin="round"/></svg></div>
+      <div class="wb" style="right:94px;bottom:104px;width:60px;height:60px;--g1:#ffe9a6;--g2:#FFC94D;--g3:#c78400"></div>
+    </div>
+    <ul class="rules">
+      <li><b>ปุ่มในเกม:</b> วงไม้โอ๊ก ขอบหมึก 3px อัญมณีตรงกลาง สีบอกหน้าที่ (แดง = ตี/ขุด, เขียวน้ำทะเล = กระโดด, ทอง = วาง/กิน, ฟ้า = นั่ง)</li>
+      <li><b>ไม่มีตัวหนังสือบนปุ่ม:</b> ใช้ไอคอนชัดๆ ที่วาดเอง ไม่ใช้อีโมจิ</li>
+      <li><b>แผงและป้าย:</b> แผ่นไม้มีหมุดทองเหลืองสี่มุม และเงาหมึกใต้แผ่น</li>
+      <li><b>ปุ่มเว็บ:</b> <a class="btn pri" style="padding:6px 14px;font-size:14px">หลัก</a> <a class="btn sec" style="padding:6px 14px;font-size:14px">รอง</a></li>
+      <li><b>พื้นหลัง:</b> ขาวโปร่ง #F9FAFB เป็นหลัก การ์ดขาว เงานุ่มบางมาก ใช้ครีมเฉพาะจุดเน้น</li><li><b>มุมโค้ง:</b> 10 / 16 / 24px และแบบแคปซูล</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Do &amp; Don't</h2>
+  <div class="dont">
+    <div class="ok"><b>ทำ</b><ul class="rules"><li>ตัวละครของเราเอง สัดส่วนน่ารักแบบของเล่น</li><li>ใช้ token จาก <code>css/brand.css</code> เสมอ</li><li>สองภาษา ไทย/อังกฤษ ทุกข้อความ</li></ul></div>
+    <div class="no"><b>ไม่ทำ</b><ul class="rules"><li>ลอกตัวละคร โลโก้ หรือหน้าตาเกมอื่น</li><li>ใช้สีดำสนิท เทาเย็น หรือนีออน</li><li>ฉากน่ากลัว เลือด หรือเสียงดังตกใจ</li></ul></div>
+  </div>
+</section>
+
+</div></body></html>
